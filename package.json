@@ -1,0 +1,31 @@
+{
+  "name": "vue-wrapped-transitions",
+  "version": "1.0.0",
+  "description": "Spotify Wrapped-style transition system for Vue.js with GSAP",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.0",
+    "gsap": "^3.12.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "vue",
+    "gsap",
+    "animations",
+    "transitions",
+    "spotify-wrapped",
+    "instagram-stories",
+    "progress-bar",
+    "mobile-first"
+  ],
+  "author": "Senior Frontend Architect",
+  "license": "MIT"
+}

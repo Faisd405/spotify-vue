@@ -1,0 +1,38 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Testing and coverage
+/coverage
+/.nyc_output
+
+# Production build output
+/dist
+/build
+
+# Local environment variables
+.env.local
+.env.*.local
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store*
+.history
+.eslintcache
+
+# Optional: TypeScript declaration files (commit if used in a specific setup, otherwise ignore)
+# components.d.ts

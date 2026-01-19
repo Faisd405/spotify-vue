@@ -86,59 +86,48 @@ import VerticalProgressBar from './VerticalProgressBar.vue'
 import StorySlide from './StorySlide.vue'
 import { useStoryProgress } from '../composables/useStoryProgress'
 
-const props = defineProps({
-  slides: {
-    type: Array,
-    required: true,
-    validator: (slides) => slides.length > 0,
+interface Slide {
+  id?: string | number
+  title?: string
+  content?: string
+  animationType?: string
+  requiresAction?: boolean
+  [key: string]: unknown
+}
+
+const props = withDefaults(
+  defineProps<{
+    slides: Slide[]
+    slideDuration?: number
+    animationDuration?: number
+    autoStart?: boolean
+    loop?: boolean
+    pauseOnHover?: boolean
+    allowProgressClick?: boolean
+    disableNavigation?: boolean
+    swipeThreshold?: number
+    defaultAnimationType?: string
+    paddingContent?: string
+  }>(),
+  {
+    slideDuration: 10,
+    animationDuration: 0.6,
+    autoStart: true,
+    loop: false,
+    pauseOnHover: false,
+    allowProgressClick: true,
+    disableNavigation: false,
+    swipeThreshold: 50,
+    defaultAnimationType: 'fade-slide',
+    paddingContent: '2rem',
   },
-  slideDuration: {
-    type: Number,
-    default: 10,
-  },
-  animationDuration: {
-    type: Number,
-    default: 0.6,
-  },
-  autoStart: {
-    type: Boolean,
-    default: true,
-  },
-  loop: {
-    type: Boolean,
-    default: false,
-  },
-  pauseOnHover: {
-    type: Boolean,
-    default: false,
-  },
-  allowProgressClick: {
-    type: Boolean,
-    default: true,
-  },
-  disableNavigation: {
-    type: Boolean,
-    default: false,
-  },
-  swipeThreshold: {
-    type: Number,
-    default: 50,
-  },
-  defaultAnimationType: {
-    type: String,
-    default: 'fade-slide',
-  },
-  paddingContent: {
-    type: String,
-    default: '2rem',
-  },
-})
+)
 
 const emit = defineEmits(['slide-change', 'story-complete', 'story-start', 'pause', 'resume'])
 
 // Refs
-const wrapperRef = ref(null)
-const slidesContainer = ref(null)
+const wrapperRef = ref<HTMLElement | null>(null)
+const slidesContainer = ref<HTMLElement | null>(null)
 const isLoading = ref(false)
 const transitionDirection = ref('next')
 
@@ -155,7 +144,7 @@ const totalSlides = computed(() => props.slides.length)
 /**
  * Get slide configuration
  */
-const getSlideConfig = (index) => {
+const getSlideConfig = (index: number) => {
   return props.slides[index] || {}
 }
 
@@ -190,15 +179,15 @@ const {
 /**
  * Get animation type for specific slide
  */
-const getAnimationType = (index) => {
+const getAnimationType = (index: number) => {
   const slide = props.slides[index]
-  return slide.animationType || props.defaultAnimationType
+  return slide?.animationType || props.defaultAnimationType
 }
 
 /**
  * Handle slide change
  */
-function handleSlideChange(newIndex, direction) {
+function handleSlideChange(newIndex: number, direction: string) {
   transitionDirection.value = direction
   emit('slide-change', {
     index: newIndex,
@@ -233,7 +222,7 @@ const previousSlide = () => {
   }
 }
 
-const goToSlide = (index) => {
+const goToSlide = (index: number) => {
   if (!isTransitioning.value) {
     jumpToSlide(index)
   }
@@ -242,7 +231,8 @@ const goToSlide = (index) => {
 /**
  * Touch event handlers for mobile swipe
  */
-const handleTouchStart = (e) => {
+const handleTouchStart = (e: TouchEvent) => {
+  if (!e.touches[0]) return
   touchStartX.value = e.touches[0].clientX
   touchStartY.value = e.touches[0].clientY
   isSwiping.value = true
@@ -253,8 +243,9 @@ const handleTouchStart = (e) => {
   }
 }
 
-const handleTouchMove = (e) => {
+const handleTouchMove = (e: TouchEvent) => {
   if (!isSwiping.value) return
+  if (!e.touches[0]) return
 
   touchEndX.value = e.touches[0].clientX
   touchEndY.value = e.touches[0].clientY
@@ -292,7 +283,8 @@ const handleTouchEnd = () => {
 /**
  * Click handler for pause/resume
  */
-const handleClick = (e) => {
+const handleClick = (e: MouseEvent) => {
+  if (!wrapperRef.value) return
   // Only toggle pause on center area clicks (not nav zones)
   const rect = wrapperRef.value.getBoundingClientRect()
   const clickX = e.clientX - rect.left
@@ -307,13 +299,13 @@ const handleClick = (e) => {
 /**
  * Animation lifecycle handlers
  */
-const handleAnimationStart = (type) => {
+const handleAnimationStart = (type: string) => {
   if (type === 'enter') {
     isLoading.value = true
   }
 }
 
-const handleAnimationComplete = (type) => {
+const handleAnimationComplete = (type: string) => {
   if (type === 'enter') {
     isLoading.value = false
   }
@@ -337,7 +329,7 @@ const handleMouseLeave = () => {
 /**
  * Keyboard navigation
  */
-const handleKeydown = (e) => {
+const handleKeydown = (e: KeyboardEvent) => {
   switch (e.key) {
     case 'ArrowRight':
     case 'ArrowDown':

@@ -77,12 +77,12 @@ const props = defineProps({
 const emit = defineEmits(['share', 'replay'])
 
 // Refs
-const outroRef = ref(null)
-const giftRef = ref(null)
-const titleRef = ref(null)
-const subtitleRef = ref(null)
-const actionsRef = ref(null)
-const badgesRef = ref(null)
+const outroRef = ref<HTMLElement | null>(null)
+const giftRef = ref<HTMLElement | null>(null)
+const titleRef = ref<HTMLElement | null>(null)
+const subtitleRef = ref<HTMLElement | null>(null)
+const actionsRef = ref<HTMLElement | null>(null)
+const badgesRef = ref<HTMLElement | null>(null)
 
 const isOpen = ref(false)
 
@@ -91,14 +91,14 @@ const particleEmojis = ['✨', '🎊', '🎉', '💫', '⭐', '🌟', '🎈', '�
 /**
  * Get particle emoji
  */
-const getParticleEmoji = (index) => {
+const getParticleEmoji = (index: number) => {
   return particleEmojis[index % particleEmojis.length]
 }
 
 /**
  * Get particle styles
  */
-const getParticleStyle = (index) => {
+const getParticleStyle = (index: number) => {
   const angle = (360 / 20) * index
   const distance = 80 + Math.random() * 40
   const tx = Math.cos((angle * Math.PI) / 180) * distance
@@ -235,30 +235,34 @@ const playEntranceAnimation = () => {
   )
 
   // Actions
-  tl.from(
-    actionsRef.value.children,
-    {
-      y: 20,
-      opacity: 0,
-      duration: 0.5,
-      stagger: 0.15,
-      ease: 'back.out(1.5)',
-    },
-    '-=0.3',
-  )
+  if (actionsRef.value) {
+    tl.from(
+      actionsRef.value.children,
+      {
+        y: 20,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.15,
+        ease: 'back.out(1.5)',
+      },
+      '-=0.3',
+    )
+  }
 
   // Badges
-  tl.from(
-    badgesRef.value.children,
-    {
-      scale: 0,
-      opacity: 0,
-      duration: 0.4,
-      stagger: 0.1,
-      ease: 'back.out(1.7)',
-    },
-    '-=0.4',
-  )
+  if (badgesRef.value) {
+    tl.from(
+      badgesRef.value.children,
+      {
+        scale: 0,
+        opacity: 0,
+        duration: 0.4,
+        stagger: 0.1,
+        ease: 'back.out(1.7)',
+      },
+      '-=0.4',
+    )
+  }
 
   return tl
 }

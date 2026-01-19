@@ -72,7 +72,7 @@ const particleEmojis = ['🎈', '🎉', '🎊', '✨', '💫', '⭐', '🌟', '�
 /**
  * Get random particle emoji
  */
-const getParticleEmoji = (index) => {
+const getParticleEmoji = (index: number) => {
   return particleEmojis[index % particleEmojis.length]
 }
 

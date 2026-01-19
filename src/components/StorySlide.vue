@@ -35,12 +35,12 @@ const props = defineProps({
   direction: {
     type: String,
     default: 'next',
-    validator: (value) => ['next', 'previous'].includes(value),
+    validator: (value: unknown) => ['next', 'previous'].includes(value as string),
   },
   animationType: {
     type: String,
     default: 'fade-slide',
-    validator: (value) =>
+    validator: (value: unknown) =>
       [
         'fade-slide',
         'scale-fade',
@@ -50,7 +50,7 @@ const props = defineProps({
         'elastic',
         'split-reveal',
         'morph',
-      ].includes(value),
+      ].includes(value as string),
   },
   animationDuration: {
     type: Number,
@@ -68,17 +68,33 @@ const props = defineProps({
 
 const emit = defineEmits(['animation-complete', 'animation-start'])
 
-const slideRef = ref(null)
+const slideRef = ref<HTMLElement | null>(null)
 const isEntering = ref(false)
 const isExiting = ref(false)
-const animationTimeline = ref(null)
+const animationTimeline = ref<gsap.core.Tween | null>(null)
+
+type AnimationType =
+  | 'fade-slide'
+  | 'scale-fade'
+  | 'rotate-fade'
+  | 'blur-zoom'
+  | 'flip'
+  | 'elastic'
+  | 'split-reveal'
+  | 'morph'
 
 /**
  * Animation presets for different slide types
  */
-const animations = {
+const animations: Record<
+  AnimationType,
+  {
+    enter: (el: HTMLElement, direction: string) => gsap.core.Tween
+    exit: (el: HTMLElement, direction?: string) => gsap.core.Tween
+  }
+> = {
   'fade-slide': {
-    enter: (el, direction) => {
+    enter: (el: HTMLElement, direction: string) => {
       const xOffset = direction === 'next' ? 100 : -100
       return gsap.fromTo(
         el,
@@ -96,7 +112,7 @@ const animations = {
         },
       )
     },
-    exit: (el, direction) => {
+    exit: (el: HTMLElement, direction: string = 'next') => {
       const xOffset = direction === 'next' ? -50 : 50
       return gsap.to(el, {
         opacity: 0,
@@ -109,7 +125,7 @@ const animations = {
   },
 
   'scale-fade': {
-    enter: (el) => {
+    enter: (el: HTMLElement) => {
       return gsap.fromTo(
         el,
         {
@@ -126,7 +142,7 @@ const animations = {
         },
       )
     },
-    exit: (el) => {
+    exit: (el: HTMLElement) => {
       return gsap.to(el, {
         opacity: 0,
         scale: 1.1,
@@ -137,7 +153,7 @@ const animations = {
   },
 
   'rotate-fade': {
-    enter: (el, direction) => {
+    enter: (el: HTMLElement, direction: string) => {
       const rotation = direction === 'next' ? 90 : -90
       return gsap.fromTo(
         el,
@@ -155,7 +171,7 @@ const animations = {
         },
       )
     },
-    exit: (el, direction) => {
+    exit: (el: HTMLElement, direction: string = 'next') => {
       const rotation = direction === 'next' ? -45 : 45
       return gsap.to(el, {
         opacity: 0,
@@ -168,7 +184,7 @@ const animations = {
   },
 
   'blur-zoom': {
-    enter: (el) => {
+    enter: (el: HTMLElement) => {
       return gsap.fromTo(
         el,
         {
@@ -185,7 +201,7 @@ const animations = {
         },
       )
     },
-    exit: (el) => {
+    exit: (el: HTMLElement) => {
       return gsap.to(el, {
         opacity: 0,
         scale: 0.9,
@@ -197,7 +213,7 @@ const animations = {
   },
 
   flip: {
-    enter: (el, direction) => {
+    enter: (el: HTMLElement, direction: string) => {
       const rotationY = direction === 'next' ? 180 : -180
       return gsap.fromTo(
         el,
@@ -214,7 +230,7 @@ const animations = {
         },
       )
     },
-    exit: (el) => {
+    exit: (el: HTMLElement) => {
       return gsap.to(el, {
         opacity: 0,
         scale: 0.8,
@@ -225,7 +241,7 @@ const animations = {
   },
 
   elastic: {
-    enter: (el, direction) => {
+    enter: (el: HTMLElement, direction: string) => {
       const yOffset = direction === 'next' ? 100 : -100
       return gsap.fromTo(
         el,
@@ -243,7 +259,7 @@ const animations = {
         },
       )
     },
-    exit: (el, direction) => {
+    exit: (el: HTMLElement, direction: string = 'next') => {
       const yOffset = direction === 'next' ? -30 : 30
       return gsap.to(el, {
         opacity: 0,
@@ -255,7 +271,7 @@ const animations = {
   },
 
   'split-reveal': {
-    enter: (el) => {
+    enter: (el: HTMLElement) => {
       return gsap.fromTo(
         el,
         {
@@ -272,7 +288,7 @@ const animations = {
         },
       )
     },
-    exit: (el) => {
+    exit: (el: HTMLElement) => {
       return gsap.to(el, {
         opacity: 0,
         clipPath: 'polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)',
@@ -283,7 +299,7 @@ const animations = {
   },
 
   morph: {
-    enter: (el) => {
+    enter: (el: HTMLElement) => {
       return gsap.fromTo(
         el,
         {
@@ -302,7 +318,7 @@ const animations = {
         },
       )
     },
-    exit: (el) => {
+    exit: (el: HTMLElement) => {
       return gsap.to(el, {
         opacity: 0,
         scale: 0.5,
@@ -317,7 +333,9 @@ const animations = {
 /**
  * Trigger custom animation from parent
  */
-const triggerAnimation = (customAnimation) => {
+const triggerAnimation = (
+  customAnimation: ((el: HTMLElement, direction: string) => void) | undefined,
+) => {
   if (slideRef.value && customAnimation) {
     customAnimation(slideRef.value, props.direction)
   }
@@ -332,7 +350,7 @@ const playEnterAnimation = async () => {
   isEntering.value = true
   emit('animation-start', 'enter')
 
-  const animation = animations[props.animationType]
+  const animation = animations[props.animationType as AnimationType]
   if (animation && animation.enter) {
     animationTimeline.value = animation.enter(slideRef.value, props.direction)
 
@@ -352,7 +370,7 @@ const playExitAnimation = async () => {
   isExiting.value = true
   emit('animation-start', 'exit')
 
-  const animation = animations[props.animationType]
+  const animation = animations[props.animationType as AnimationType]
   if (animation && animation.exit) {
     animationTimeline.value = animation.exit(slideRef.value, props.direction)
 

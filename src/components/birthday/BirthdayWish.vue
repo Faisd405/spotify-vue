@@ -72,7 +72,7 @@ const isBlown = ref(false)
 /**
  * Get confetti styles
  */
-const getConfettiStyle = (index) => {
+const getConfettiStyle = (index: number) => {
   const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7dc6f', '#bb8fce', '#85c1e2']
   const angle = (360 / 30) * index
   const distance = 150 + Math.random() * 100

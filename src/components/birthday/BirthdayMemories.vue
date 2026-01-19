@@ -33,39 +33,38 @@
 import { ref, onMounted, watch } from 'vue'
 import { gsap } from 'gsap'
 
-const props = defineProps({
-  memories: {
-    type: Array,
-    default: () => [
-      { icon: '🎬', count: '47', label: 'Movies Watched' },
-      { icon: '☕', count: '156', label: 'Coffee Dates' },
-      { icon: '🎵', count: '2,847', label: 'Songs Shared' },
-      { icon: '📸', count: '289', label: 'Photos Taken' },
-    ],
-  },
-  quote: {
-    type: String,
-    default: 'Every moment with you is a celebration',
-  },
-  isActive: {
-    type: Boolean,
-    default: false,
-  },
-})
+interface Memory {
+  icon: string
+  count: string
+  label: string
+}
+
+const props = defineProps<{
+  memories?: Memory[]
+  quote?: string
+  isActive?: boolean
+}>()
+
+const memories = props.memories || [
+  { icon: '🎬', count: '47', label: 'Movies Watched' },
+  { icon: '☕', count: '156', label: 'Coffee Dates' },
+  { icon: '🎵', count: '2,847', label: 'Songs Shared' },
+  { icon: '📸', count: '289', label: 'Photos Taken' },
+]
 
 // Refs
-const memoriesRef = ref(null)
-const headerRef = ref(null)
-const gridRef = ref(null)
-const quoteRef = ref(null)
-const cardRefs = ref([])
+const memoriesRef = ref<HTMLElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null)
+const gridRef = ref<HTMLElement | null>(null)
+const quoteRef = ref<HTMLElement | null>(null)
+const cardRefs = ref<HTMLElement[]>([])
 
 /**
  * Set card ref
  */
-const setCardRef = (el, index) => {
+const setCardRef = (el: unknown, index: number) => {
   if (el) {
-    cardRefs.value[index] = el
+    cardRefs.value[index] = el as HTMLElement
   }
 }
 
@@ -76,13 +75,15 @@ const playEntranceAnimation = () => {
   const tl = gsap.timeline()
 
   // Header
-  tl.from(headerRef.value.querySelectorAll('.label, .title'), {
-    y: 30,
-    opacity: 0,
-    duration: 0.6,
-    stagger: 0.2,
-    ease: 'power3.out',
-  })
+  if (headerRef.value) {
+    tl.from(headerRef.value.querySelectorAll('.label, .title'), {
+      y: 30,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.2,
+      ease: 'power3.out',
+    })
+  }
 
   // Cards with stagger and counter animation
   tl.from(
@@ -104,9 +105,11 @@ const playEntranceAnimation = () => {
 
   // Animate numbers counting up
   cardRefs.value.forEach((card, index) => {
-    const countElement = card.querySelector('.memory-count')
-    const targetValue = props.memories[index].count.replace(/,/g, '')
-    const hasComma = props.memories[index].count.includes(',')
+    const countElement = card.querySelector('.memory-count') as HTMLElement
+    const memory = memories[index]
+    if (!memory) return
+    const targetValue = memory.count.replace(/,/g, '')
+    const hasComma = memory.count.includes(',')
 
     const obj = { value: 0 }
     tl.to(

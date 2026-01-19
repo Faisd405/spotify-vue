@@ -45,22 +45,22 @@ const props = defineProps({
   orientation: {
     type: String,
     default: 'horizontal',
-    validator: (v) => ['vertical', 'horizontal'].includes(v),
+    validator: (v: unknown) => ['vertical', 'horizontal'].includes(v as string),
   },
 })
 
 const emit = defineEmits(['segment-click', 'slide-change'])
 
-const fillRefs = ref({})
+const fillRefs = ref<Record<number, HTMLElement>>({})
 const segments = computed(() => Array.from({ length: props.totalSlides }))
 
 const axis = computed(() => (props.orientation === 'vertical' ? 'scaleY' : 'scaleX'))
 
-const setFillRef = (el, index) => {
-  if (el) fillRefs.value[index] = el
+const setFillRef = (el: unknown, index: number) => {
+  if (el) fillRefs.value[index] = el as HTMLElement
 }
 
-const getFillStyle = (index) => {
+const getFillStyle = (index: number) => {
   if (index < props.currentSlide) {
     return { transform: `${axis.value}(1)` }
   }
@@ -83,7 +83,7 @@ const getPulseStyle = () => {
   return { left: `${progressPercent}%` }
 }
 
-const onSegmentClick = (index) => {
+const onSegmentClick = (index: number) => {
   if (!props.clickable || index === props.currentSlide) return
   emit('segment-click', index)
   emit('slide-change', index)
@@ -97,7 +97,7 @@ watch(
   },
 )
 
-const animateSegmentTransition = (from, to) => {
+const animateSegmentTransition = (from: number, to: number) => {
   const forward = to > from
 
   if (forward) {

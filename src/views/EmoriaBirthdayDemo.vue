@@ -81,9 +81,18 @@ import BirthdayMessage from '../components/birthday/BirthdayMessage.vue'
 import BirthdayWish from '../components/birthday/BirthdayWish.vue'
 import BirthdayOutro from '../components/birthday/BirthdayOutro.vue'
 
+interface StoryWrapperRef {
+  completeAction: () => void
+  reset: () => void
+}
+
+interface WishRef {
+  blowCandle: () => void
+}
+
 // Refs
-const storyRef = ref(null)
-const wishRef = ref(null)
+const storyRef = ref<StoryWrapperRef | null>(null)
+const wishRef = ref<WishRef | null>(null)
 
 // Configuration
 const recipientName = ref('Faiz')
@@ -120,8 +129,10 @@ const birthdaySlides = ref([
 /**
  * Handle slide change
  */
-const handleSlideChange = ({ index, direction }) => {
-  console.log(`Slide ${index} - ${birthdaySlides.value[index].id}`, direction)
+const handleSlideChange = ({ index, direction }: { index: number; direction: string }) => {
+  if (birthdaySlides.value[index]) {
+    console.log(`Slide ${index} - ${birthdaySlides.value[index].id}`, direction)
+  }
 }
 
 /**
@@ -157,8 +168,8 @@ const handleComplete = () => {
 /**
  * Handle share
  */
-const handleShare = () => {
-  console.log('Sharing birthday story...')
+const handleShare = (platform?: string) => {
+  console.log('Sharing birthday story...', platform ? `via ${platform}` : '')
 
   // Complete action after sharing
   setTimeout(() => {

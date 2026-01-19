@@ -56,13 +56,13 @@ const props = defineProps({
 })
 
 // Refs
-const messageRef = ref(null)
-const iconRef = ref(null)
-const textRef = ref(null)
-const signatureRef = ref(null)
-const sparklesRef = ref(null)
-const heartsRef = ref(null)
-const lineRefs = ref([])
+const messageRef = ref<HTMLElement | null>(null)
+const iconRef = ref<HTMLElement | null>(null)
+const textRef = ref<HTMLElement | null>(null)
+const signatureRef = ref<HTMLElement | null>(null)
+const sparklesRef = ref<HTMLElement | null>(null)
+const heartsRef = ref<HTMLElement | null>(null)
+const lineRefs = ref<HTMLElement[]>([])
 
 /**
  * Split message into lines
@@ -74,16 +74,16 @@ const messageLines = computed(() => {
 /**
  * Set line ref
  */
-const setLineRef = (el, index) => {
+const setLineRef = (el: unknown, index: number) => {
   if (el) {
-    lineRefs.value[index] = el
+    lineRefs.value[index] = el as HTMLElement
   }
 }
 
 /**
  * Get heart styles
  */
-const getHeartStyle = (index) => {
+const getHeartStyle = (index: number) => {
   const left = 10 + index * 5
   const delay = index * 0.3
   const duration = 4 + Math.random() * 2

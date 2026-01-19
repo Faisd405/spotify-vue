@@ -172,9 +172,13 @@ import { ref, onMounted } from 'vue'
 import { gsap } from 'gsap'
 import StoryWrapper from '../components/StoryWrapper.vue'
 
+interface StoryWrapperRef {
+  reset: () => void
+}
+
 // Refs
-const storyWrapperRef = ref(null)
-const shareableCardRef = ref(null)
+const storyWrapperRef = ref<StoryWrapperRef | null>(null)
+const shareableCardRef = ref<HTMLElement | null>(null)
 const showConfetti = ref(false)
 
 // Story slides configuration
@@ -198,7 +202,7 @@ const topGenres = [
 /**
  * Handle slide change with special logic for final card
  */
-const handleSlideChange = ({ index, direction }) => {
+const handleSlideChange = ({ index, direction }: { index: number; direction: string }) => {
   console.log(`Slide changed to ${index}, direction: ${direction}`)
 
   // Special transition TO the shareable card (from story to card)
@@ -223,8 +227,8 @@ const triggerShareableCardEntrance = () => {
   setTimeout(() => {
     if (!shareableCardRef.value) return
 
-    const card = shareableCardRef.value.querySelector('.shareable-card')
-    const actions = shareableCardRef.value.querySelector('.share-actions')
+    const card = shareableCardRef.value.querySelector('.shareable-card') as HTMLElement
+    const actions = shareableCardRef.value.querySelector('.share-actions') as HTMLElement
 
     // Create master timeline for coordinated animations
     const tl = gsap.timeline({
@@ -261,7 +265,7 @@ const triggerShareableCardEntrance = () => {
 
     // Animate card stats in sequence
     const stats = card.querySelectorAll('.card-stat')
-    stats.forEach((stat, idx) => {
+    stats.forEach((stat: Element, idx: number) => {
       tl.fromTo(
         stat,
         {
@@ -315,7 +319,8 @@ const hideShareableCard = () => {
 
   if (!shareableCardRef.value) return
 
-  const card = shareableCardRef.value.querySelector('.shareable-card')
+  const card = shareableCardRef.value.querySelector('.shareable-card') as HTMLElement
+  if (!card) return
 
   gsap.to(card, {
     scale: 0.8,
@@ -337,7 +342,8 @@ const handleStoryComplete = () => {
 /**
  * Get random confetti styles
  */
-const getConfettiStyle = () => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getConfettiStyle = (_index?: number) => {
   const colors = ['#1DB954', '#FF6B6B', '#4ECDC4', '#FFE66D', '#A8E6CF']
   const randomColor = colors[Math.floor(Math.random() * colors.length)]
   const randomX = Math.random() * 100

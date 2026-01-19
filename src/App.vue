@@ -1,13 +1,13 @@
 <template>
   <div id="app">
-    <!-- Switch between demos -->
-    <EmoriaBirthdayDemo />
-    <!-- <SpotifyWrappedDemo /> -->
+    <div id="app-container">
+      <RouterView />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import EmoriaBirthdayDemo from './examples/EmoriaBirthdayDemo.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <style>

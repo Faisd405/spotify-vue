@@ -8,16 +8,14 @@
 
       <!-- Message content -->
       <div class="message-content">
-        <div class="message-icon" ref="iconRef">
-          💝
-        </div>
+        <div class="message-icon" ref="iconRef">💝</div>
 
         <div class="message-text" ref="textRef">
-          <p 
+          <p
             v-for="(line, index) in messageLines"
             :key="index"
             class="message-line"
-            :ref="el => setLineRef(el, index)"
+            :ref="(el) => setLineRef(el, index)"
           >
             {{ line }}
           </p>
@@ -31,83 +29,77 @@
 
       <!-- Floating hearts -->
       <div class="hearts" ref="heartsRef">
-        <div 
-          v-for="i in 15"
-          :key="i"
-          class="heart"
-          :style="getHeartStyle(i)"
-        >
-          ❤️
-        </div>
+        <div v-for="i in 15" :key="i" class="heart" :style="getHeartStyle(i)">❤️</div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { gsap } from 'gsap';
+<script setup lang="ts">
+import { ref, computed, onMounted, watch } from 'vue'
+import { gsap } from 'gsap'
 
 const props = defineProps({
   message: {
     type: String,
-    default: 'On your special day, I want you to know how much you mean to me. Your smile lights up every room, and your kindness touches everyone around you. May this year bring you endless joy and beautiful moments.'
+    default:
+      'On your special day, I want you to know how much you mean to me. Your smile lights up every room, and your kindness touches everyone around you. May this year bring you endless joy and beautiful moments.',
   },
   senderName: {
     type: String,
-    default: 'Your Friends'
+    default: 'Your Friends',
   },
   isActive: {
     type: Boolean,
-    default: false
-  }
-});
+    default: false,
+  },
+})
 
 // Refs
-const messageRef = ref(null);
-const iconRef = ref(null);
-const textRef = ref(null);
-const signatureRef = ref(null);
-const sparklesRef = ref(null);
-const heartsRef = ref(null);
-const lineRefs = ref([]);
+const messageRef = ref(null)
+const iconRef = ref(null)
+const textRef = ref(null)
+const signatureRef = ref(null)
+const sparklesRef = ref(null)
+const heartsRef = ref(null)
+const lineRefs = ref([])
 
 /**
  * Split message into lines
  */
 const messageLines = computed(() => {
-  return props.message.split('. ').filter(line => line.length > 0);
-});
+  return props.message.split('. ').filter((line) => line.length > 0)
+})
 
 /**
  * Set line ref
  */
 const setLineRef = (el, index) => {
   if (el) {
-    lineRefs.value[index] = el;
+    lineRefs.value[index] = el
   }
-};
+}
 
 /**
  * Get heart styles
  */
 const getHeartStyle = (index) => {
-  const left = 10 + (index * 5);
-  const delay = index * 0.3;
-  const duration = 4 + Math.random() * 2;
-  
+  const left = 10 + index * 5
+  const delay = index * 0.3
+  const duration = 4 + Math.random() * 2
+
   return {
     left: `${left}%`,
     animationDelay: `${delay}s`,
-    animationDuration: `${duration}s`
-  };
-};
+    animationDuration: `${duration}s`,
+  }
+}
 
 /**
  * Play entrance animation
  */
 const playEntranceAnimation = () => {
-  const tl = gsap.timeline();
+  const tl = gsap.timeline()
 
   // Icon entrance
   tl.from(iconRef.value, {
@@ -115,76 +107,95 @@ const playEntranceAnimation = () => {
     rotation: -180,
     opacity: 0,
     duration: 0.8,
-    ease: 'back.out(2)'
-  });
+    ease: 'back.out(2)',
+  })
 
   // Sparkles burst
-  tl.from('.sparkle', {
-    scale: 0,
-    opacity: 0,
-    duration: 0.5,
-    stagger: {
-      each: 0.05,
-      from: 'random'
+  tl.from(
+    '.sparkle',
+    {
+      scale: 0,
+      opacity: 0,
+      duration: 0.5,
+      stagger: {
+        each: 0.05,
+        from: 'random',
+      },
+      ease: 'back.out(1.7)',
     },
-    ease: 'back.out(1.7)'
-  }, '-=0.4');
+    '-=0.4',
+  )
 
   // Message lines with typewriter effect
   lineRefs.value.forEach((line, index) => {
-    tl.from(line, {
+    tl.from(
+      line,
+      {
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+        ease: 'power2.out',
+      },
+      `-=${index === 0 ? 0.2 : 0.4}`,
+    )
+  })
+
+  // Signature
+  tl.from(
+    signatureRef.value,
+    {
+      scale: 0.8,
       opacity: 0,
       y: 20,
       duration: 0.6,
-      ease: 'power2.out'
-    }, `-=${index === 0 ? 0.2 : 0.4}`);
-  });
-
-  // Signature
-  tl.from(signatureRef.value, {
-    scale: 0.8,
-    opacity: 0,
-    y: 20,
-    duration: 0.6,
-    ease: 'back.out(1.5)'
-  }, '-=0.3');
+      ease: 'back.out(1.5)',
+    },
+    '-=0.3',
+  )
 
   // Hearts float in
-  tl.from('.heart', {
-    scale: 0,
-    opacity: 0,
-    duration: 0.5,
-    stagger: {
-      each: 0.08,
-      from: 'random'
+  tl.from(
+    '.heart',
+    {
+      scale: 0,
+      opacity: 0,
+      duration: 0.5,
+      stagger: {
+        each: 0.08,
+        from: 'random',
+      },
+      ease: 'back.out(1.5)',
     },
-    ease: 'back.out(1.5)'
-  }, '-=0.8');
+    '-=0.8',
+  )
 
-  return tl;
-};
+  return tl
+}
 
 /**
  * Watch for active state
  */
-watch(() => props.isActive, (isActive) => {
-  if (isActive) {
-    playEntranceAnimation();
-  }
-});
+watch(
+  () => props.isActive,
+  (isActive) => {
+    if (isActive) {
+      playEntranceAnimation()
+    }
+  },
+)
 
 /**
  * Mount
  */
 onMounted(() => {
   if (props.isActive) {
-    playEntranceAnimation();
+    playEntranceAnimation()
   }
-});
+})
 
 defineExpose({
-  playEntranceAnimation
-});
+  playEntranceAnimation,
+})
 </script>
 
 <style scoped>
@@ -223,8 +234,14 @@ defineExpose({
 }
 
 @keyframes sparkle-twinkle {
-  0% { opacity: 0.3; transform: scale(0.8); }
-  100% { opacity: 1; transform: scale(1.2); }
+  0% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
 }
 
 /* Content */
@@ -247,8 +264,13 @@ defineExpose({
 }
 
 @keyframes pulse-heart {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* Message text */
@@ -331,24 +353,24 @@ defineExpose({
     padding: 1.5rem;
     max-width: 90%;
   }
-  
+
   .message-content {
     padding: 2rem 1.5rem;
     border-radius: 24px;
   }
-  
+
   .message-icon {
     font-size: 3rem;
   }
-  
+
   .sparkles {
     gap: 10px;
   }
-  
+
   .sparkle {
     font-size: 1.2rem;
   }
-  
+
   .heart {
     font-size: 1.2rem;
   }

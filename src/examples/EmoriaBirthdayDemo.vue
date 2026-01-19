@@ -13,7 +13,6 @@
         @slide-change="handleSlideChange"
         @story-complete="handleComplete"
       >
-
         <!-- Slide 0: Intro -->
         <template #slide-0="{ isActive }">
           <BirthdayIntro
@@ -25,11 +24,7 @@
 
         <!-- Slide 1: Memories -->
         <template #slide-1="{ isActive }">
-          <BirthdayMemories
-            :memories="memories"
-            :quote="memoriesQuote"
-            :is-active="isActive"
-          />
+          <BirthdayMemories :memories="memories" :quote="memoriesQuote" :is-active="isActive" />
         </template>
 
         <!-- Slide 2: Message -->
@@ -42,23 +37,33 @@
         </template>
 
         <!-- Slide 3: Wish -->
-        <template #slide-3="{ isActive }">
+        <template #slide-3="{ isActive, completeAction }">
           <BirthdayWish
             ref="wishRef"
             :wish-text="wishText"
             :is-active="isActive"
-            @wish-blown="handleWishBlown"
+            @wish-blown="
+              () => {
+                handleWishBlown()
+                completeAction()
+              }
+            "
             @click="handleWishClick"
           />
         </template>
 
         <!-- Slide 4: Outro -->
-        <template #slide-4="{ isActive }">
+        <template #slide-4="{ isActive, completeAction }">
           <BirthdayOutro
             :final-message="finalMessage"
             :sub-message="subMessage"
             :is-active="isActive"
-            @share="handleShare"
+            @share="
+              (platform) => {
+                handleShare(platform)
+                completeAction()
+              }
+            "
             @replay="handleReplay"
           />
         </template>
@@ -67,122 +72,123 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import StoryWrapper from '../components/StoryWrapper.vue';
-import BirthdayIntro from '../components/birthday/BirthdayIntro.vue';
-import BirthdayMemories from '../components/birthday/BirthdayMemories.vue';
-import BirthdayMessage from '../components/birthday/BirthdayMessage.vue';
-import BirthdayWish from '../components/birthday/BirthdayWish.vue';
-import BirthdayOutro from '../components/birthday/BirthdayOutro.vue';
+<script setup lang="ts">
+import { ref } from 'vue'
+import StoryWrapper from '../components/StoryWrapper.vue'
+import BirthdayIntro from '../components/birthday/BirthdayIntro.vue'
+import BirthdayMemories from '../components/birthday/BirthdayMemories.vue'
+import BirthdayMessage from '../components/birthday/BirthdayMessage.vue'
+import BirthdayWish from '../components/birthday/BirthdayWish.vue'
+import BirthdayOutro from '../components/birthday/BirthdayOutro.vue'
 
 // Refs
-const storyRef = ref(null);
-const wishRef = ref(null);
+const storyRef = ref(null)
+const wishRef = ref(null)
 
 // Configuration
-const recipientName = ref('Faiz');
-const birthDate = ref('January 19, 2026');
-const senderName = ref('Your Friends & Family');
+const recipientName = ref('Faiz')
+const birthDate = ref('January 19, 2026')
+const senderName = ref('Your Friends & Family')
 
 const memories = ref([
   { icon: '🎬', count: '47', label: 'Movies Watched' },
   { icon: '☕', count: '156', label: 'Coffee Dates' },
   { icon: '🎵', count: '2,847', label: 'Songs Shared' },
-  { icon: '📸', count: '289', label: 'Photos Taken' }
-]);
+  { icon: '📸', count: '289', label: 'Photos Taken' },
+])
 
-const memoriesQuote = ref('Every moment with you is a celebration');
+const memoriesQuote = ref('Every moment with you is a celebration')
 
 const personalMessage = ref(
-  'On your special day, I want you to know how much you mean to me. Your smile lights up every room, and your kindness touches everyone around you. May this year bring you endless joy and beautiful moments.'
-);
+  'On your special day, I want you to know how much you mean to me. Your smile lights up every room, and your kindness touches everyone around you. May this year bring you endless joy and beautiful moments.',
+)
 
-const wishText = ref('May all your dreams come true this year and beyond');
+const wishText = ref('May all your dreams come true this year and beyond')
 
-const finalMessage = ref('Here\'s to another amazing year!');
-const subMessage = ref('May your birthday be filled with love, laughter, and unforgettable moments');
+const finalMessage = ref("Here's to another amazing year!")
+const subMessage = ref('May your birthday be filled with love, laughter, and unforgettable moments')
 
 // Slide configuration
 const birthdaySlides = ref([
   { id: 'intro', animationType: 'scale-fade' },
   { id: 'memories', animationType: 'fade-slide' },
   { id: 'message', animationType: 'blur-zoom' },
-  { id: 'wish', animationType: 'elastic' },
-  { id: 'outro', animationType: 'morph' }
-]);
+  { id: 'wish', animationType: 'elastic', requiresAction: true },
+  { id: 'outro', animationType: 'morph', requiresAction: true },
+])
 
 /**
  * Handle slide change
  */
 const handleSlideChange = ({ index, direction }) => {
-  console.log(`Slide ${index} - ${birthdaySlides.value[index].id}`, direction);
-};
+  console.log(`Slide ${index} - ${birthdaySlides.value[index].id}`, direction)
+}
 
 /**
  * Handle wish click
  */
 const handleWishClick = () => {
   if (wishRef.value) {
-    wishRef.value.blowCandle();
+    wishRef.value.blowCandle()
   }
-};
+}
 
 /**
  * Handle wish blown
  */
 const handleWishBlown = () => {
-  console.log('Wish blown! 🎉');
-  
-  // Auto-advance after 2 seconds
+  console.log('Wish blown! 🎉')
+
+  // Complete action to trigger auto-advance
   setTimeout(() => {
     if (storyRef.value) {
-      storyRef.value.nextSlide();
+      storyRef.value.completeAction()
     }
-  }, 2000);
-};
+  }, 1500)
+}
 
 /**
  * Handle story complete
  */
 const handleComplete = () => {
-  console.log('Birthday story completed! 🎂');
-};
+  console.log('Birthday story completed! 🎂')
+}
 
 /**
  * Handle share
  */
 const handleShare = () => {
-  console.log('Sharing birthday story...');
-  
+  console.log('Sharing birthday story...')
+
+  // Complete action after sharing
+  setTimeout(() => {
+    if (storyRef.value) {
+      storyRef.value.completeAction()
+    }
+  }, 800)
+
   // Implement Web Share API or custom share logic
   if (navigator.share) {
-    navigator.share({
-      title: `${recipientName.value}'s Birthday 2026`,
-      text: 'Check out this amazing birthday story!',
-      url: window.location.href
-    }).catch(err => console.log('Share cancelled', err));
+    navigator
+      .share({
+        title: `${recipientName.value}'s Birthday 2026`,
+        text: 'Check out this amazing birthday story!',
+        url: window.location.href,
+      })
+      .catch((err) => console.log('Share cancelled', err))
   } else {
-    alert('Share: Copy link or use social media buttons');
+    alert('Share: Copy link or use social media buttons')
   }
-};
+}
 
 /**
  * Handle replay
  */
 const handleReplay = () => {
   if (storyRef.value) {
-    storyRef.value.reset();
+    storyRef.value.reset()
   }
-};
-
-/**
- * Handle close
- */
-const handleClose = () => {
-  console.log('Closing birthday story');
-  // Implement navigation or close logic
-};
+}
 </script>
 
 <style scoped>
@@ -282,7 +288,7 @@ const handleClose = () => {
   .emoria-birthday-wrapper {
     padding: 0;
   }
-  
+
   .story-frame {
     max-width: 100%;
     width: 100vw;
@@ -291,7 +297,7 @@ const handleClose = () => {
     border-radius: 0;
     aspect-ratio: auto;
   }
-  
+
   .custom-header {
     padding-top: max(1rem, env(safe-area-inset-top));
   }

@@ -63,22 +63,22 @@ npm install gsap
   </StoryWrapper>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import StoryWrapper from './components/StoryWrapper.vue';
+<script setup lang="ts">
+import { ref } from 'vue'
+import StoryWrapper from './components/StoryWrapper.vue'
 
 const storySlides = ref([
   { id: 'slide-1', animationType: 'fade-slide' },
-  { id: 'slide-2', animationType: 'scale-fade' }
-]);
+  { id: 'slide-2', animationType: 'scale-fade' },
+])
 
 const handleSlideChange = ({ index, slide, direction }) => {
-  console.log(`Changed to slide ${index}`);
-};
+  console.log(`Changed to slide ${index}`)
+}
 
 const handleComplete = () => {
-  console.log('Story completed!');
-};
+  console.log('Story completed!')
+}
 </script>
 ```
 
@@ -105,30 +105,32 @@ The system includes specialized logic for transitioning from story slides to a f
   </StoryWrapper>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { storyToCardTransition } from './utils/gsapHelpers';
+<script setup lang="ts">
+import { ref } from 'vue'
+import { storyToCardTransition } from './utils/gsapHelpers'
 
-const cardRef = ref(null);
+const cardRef = ref(null)
 
 const handleSlideChange = ({ index }) => {
   // Trigger special transition when reaching final card
   if (index === slides.length - 1) {
-    triggerCardEntrance();
+    triggerCardEntrance()
   }
-};
+}
 
 const triggerCardEntrance = () => {
-  const card = cardRef.value;
-  
+  const card = cardRef.value
+
   // Custom 3D flip entrance with confetti
-  gsap.timeline()
-    .fromTo(card, 
+  gsap
+    .timeline()
+    .fromTo(
+      card,
       {
         opacity: 0,
         scale: 0.3,
         rotationY: -180,
-        z: -500
+        z: -500,
       },
       {
         opacity: 1,
@@ -136,11 +138,11 @@ const triggerCardEntrance = () => {
         rotationY: 0,
         z: 0,
         duration: 1.2,
-        ease: 'back.out(1.5)'
-      }
+        ease: 'back.out(1.5)',
+      },
     )
-    .add(() => showConfetti());
-};
+    .add(() => showConfetti())
+}
 </script>
 ```
 
@@ -163,63 +165,63 @@ Specify per slide:
 const slides = [
   { id: 'welcome', animationType: 'scale-fade' },
   { id: 'stats', animationType: 'blur-zoom' },
-  { id: 'card', animationType: 'morph' }
-];
+  { id: 'card', animationType: 'morph' },
+]
 ```
 
 ## 🎮 API Reference
 
 ### StoryWrapper Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `slides` | Array | required | Array of slide configurations |
-| `slideDuration` | Number | 5 | Duration per slide (seconds) |
-| `animationDuration` | Number | 0.6 | Transition duration (seconds) |
-| `autoStart` | Boolean | true | Auto-start on mount |
-| `loop` | Boolean | false | Loop back to start |
-| `pauseOnHover` | Boolean | false | Pause on mouse hover |
-| `allowProgressClick` | Boolean | true | Allow clicking progress bar |
-| `disableNavigation` | Boolean | false | Disable nav overlays |
-| `swipeThreshold` | Number | 50 | Swipe distance threshold (px) |
-| `defaultAnimationType` | String | 'fade-slide' | Default animation type |
+| Prop                   | Type    | Default      | Description                   |
+| ---------------------- | ------- | ------------ | ----------------------------- |
+| `slides`               | Array   | required     | Array of slide configurations |
+| `slideDuration`        | Number  | 5            | Duration per slide (seconds)  |
+| `animationDuration`    | Number  | 0.6          | Transition duration (seconds) |
+| `autoStart`            | Boolean | true         | Auto-start on mount           |
+| `loop`                 | Boolean | false        | Loop back to start            |
+| `pauseOnHover`         | Boolean | false        | Pause on mouse hover          |
+| `allowProgressClick`   | Boolean | true         | Allow clicking progress bar   |
+| `disableNavigation`    | Boolean | false        | Disable nav overlays          |
+| `swipeThreshold`       | Number  | 50           | Swipe distance threshold (px) |
+| `defaultAnimationType` | String  | 'fade-slide' | Default animation type        |
 
 ### StoryWrapper Events
 
-| Event | Payload | Description |
-|-------|---------|-------------|
-| `slide-change` | `{ index, slide, direction }` | Fires when slide changes |
-| `story-complete` | - | Fires when all slides complete |
-| `story-start` | - | Fires when story starts |
-| `pause` | - | Fires when paused |
-| `resume` | - | Fires when resumed |
+| Event            | Payload                       | Description                    |
+| ---------------- | ----------------------------- | ------------------------------ |
+| `slide-change`   | `{ index, slide, direction }` | Fires when slide changes       |
+| `story-complete` | -                             | Fires when all slides complete |
+| `story-start`    | -                             | Fires when story starts        |
+| `pause`          | -                             | Fires when paused              |
+| `resume`         | -                             | Fires when resumed             |
 
 ### useStoryProgress Composable
 
 ```javascript
-import { useStoryProgress } from './composables/useStoryProgress';
+import { useStoryProgress } from './composables/useStoryProgress'
 
 const {
-  currentSlide,      // ref: Current slide index
-  progress,          // ref: Current progress (0-100)
-  isPaused,          // ref: Pause state
-  isTransitioning,   // ref: Transition state
-  isFirstSlide,      // computed: Is first slide
-  isLastSlide,       // computed: Is last slide
-  startProgress,     // fn: Start/restart progress
-  nextSlide,         // fn: Go to next slide
-  previousSlide,     // fn: Go to previous slide
-  goToSlide,         // fn: Jump to slide index
-  pause,             // fn: Pause progress
-  resume,            // fn: Resume progress
-  togglePause,       // fn: Toggle pause/resume
-  reset              // fn: Reset to first slide
+  currentSlide, // ref: Current slide index
+  progress, // ref: Current progress (0-100)
+  isPaused, // ref: Pause state
+  isTransitioning, // ref: Transition state
+  isFirstSlide, // computed: Is first slide
+  isLastSlide, // computed: Is last slide
+  startProgress, // fn: Start/restart progress
+  nextSlide, // fn: Go to next slide
+  previousSlide, // fn: Go to previous slide
+  goToSlide, // fn: Jump to slide index
+  pause, // fn: Pause progress
+  resume, // fn: Resume progress
+  togglePause, // fn: Toggle pause/resume
+  reset, // fn: Reset to first slide
 } = useStoryProgress({
   totalSlides: 5,
   duration: 5,
   onSlideChange: (index, direction) => {},
-  onComplete: () => {}
-});
+  onComplete: () => {},
+})
 ```
 
 ## 📱 Mobile Optimization
@@ -238,26 +240,21 @@ The system is optimized for mobile-first performance:
 Create custom transition logic:
 
 ```javascript
-import { gsap } from 'gsap';
+import { gsap } from 'gsap'
 
 // Custom story-to-card transition
 const customTransition = (storyEl, cardEl) => {
-  const tl = gsap.timeline();
-  
+  const tl = gsap.timeline()
+
   // Your custom animation logic
-  tl.to(storyEl, { 
-    opacity: 0, 
+  tl.to(storyEl, {
+    opacity: 0,
     scale: 0.8,
-    duration: 0.5 
-  })
-  .fromTo(cardEl,
-    { opacity: 0, y: 100 },
-    { opacity: 1, y: 0, duration: 0.8 },
-    '-=0.2'
-  );
-  
-  return tl;
-};
+    duration: 0.5,
+  }).fromTo(cardEl, { opacity: 0, y: 100 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.2')
+
+  return tl
+}
 ```
 
 ## 🔧 GSAP Helper Utilities
@@ -265,32 +262,32 @@ const customTransition = (storyEl, cardEl) => {
 Import ready-to-use animation helpers:
 
 ```javascript
-import { 
+import {
   storyToCardTransition,
   cardToStoryTransition,
   animateNumber,
   confettiBurst,
   floatingAnimation,
-  staggerChildren
-} from './utils/gsapHelpers';
+  staggerChildren,
+} from './utils/gsapHelpers'
 
 // Animate number counter
-animateNumber(element, 52847, { 
-  duration: 2, 
-  decimals: 0 
-});
+animateNumber(element, 52847, {
+  duration: 2,
+  decimals: 0,
+})
 
 // Create confetti burst
-confettiBurst(container, { 
-  count: 50, 
-  colors: ['#1DB954', '#FF6B6B'] 
-});
+confettiBurst(container, {
+  count: 50,
+  colors: ['#1DB954', '#FF6B6B'],
+})
 
 // Add floating animation
-floatingAnimation(element, { 
-  distance: 10, 
-  duration: 2 
-});
+floatingAnimation(element, {
+  distance: 10,
+  duration: 2,
+})
 ```
 
 ## 🎨 Styling Guide
@@ -300,7 +297,7 @@ The components use scoped styles with CSS custom properties for easy theming:
 ```css
 /* Override in your global styles */
 .story-wrapper {
-  --progress-bar-color: #1DB954;
+  --progress-bar-color: #1db954;
   --progress-track-color: rgba(255, 255, 255, 0.3);
   --card-background: rgba(255, 255, 255, 0.95);
   --card-border-radius: 24px;

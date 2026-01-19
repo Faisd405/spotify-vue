@@ -77,8 +77,8 @@
           <div class="slide-content">
             <p class="slide-label fade-in-up">Your Top Genres</p>
             <div class="genre-list">
-              <div 
-                v-for="(genre, idx) in topGenres" 
+              <div
+                v-for="(genre, idx) in topGenres"
                 :key="idx"
                 class="genre-item fade-in-left"
                 :style="{ animationDelay: `${idx * 0.15}s` }"
@@ -86,10 +86,7 @@
                 <span class="genre-rank">{{ idx + 1 }}</span>
                 <span class="genre-name">{{ genre.name }}</span>
                 <span class="genre-bar">
-                  <span 
-                    class="genre-bar-fill"
-                    :style="{ width: genre.percentage + '%' }"
-                  ></span>
+                  <span class="genre-bar-fill" :style="{ width: genre.percentage + '%' }"></span>
                 </span>
                 <span class="genre-percent">{{ genre.percentage }}%</span>
               </div>
@@ -100,9 +97,9 @@
       </template>
 
       <!-- Final Slide: Shareable Card with Special Transition -->
-      <template #slide-5="{ isActive, triggerAnimation }">
-        <div 
-          class="slide slide-shareable-card" 
+      <template #slide-5="{ isActive }">
+        <div
+          class="slide slide-shareable-card"
           :class="{ 'is-active': isActive }"
           ref="shareableCardRef"
         >
@@ -113,7 +110,7 @@
                 <h3>My 2026 Wrapped</h3>
                 <span class="card-year">2026</span>
               </div>
-              
+
               <div class="card-stats">
                 <div class="card-stat">
                   <div class="card-stat-value">234</div>
@@ -147,17 +144,12 @@
               </button>
             </div>
           </div>
-          
+
           <div class="gradient-bg gradient-rainbow"></div>
-          
+
           <!-- Confetti effect -->
           <div v-if="showConfetti" class="confetti-container">
-            <div 
-              v-for="i in 50" 
-              :key="i"
-              class="confetti"
-              :style="getConfettiStyle(i)"
-            ></div>
+            <div v-for="i in 50" :key="i" class="confetti" :style="getConfettiStyle(i)"></div>
           </div>
         </div>
       </template>
@@ -168,24 +160,22 @@
           <button class="btn-close" @click="handleClose">
             <span>✕</span>
           </button>
-          <div class="slide-counter">
-            {{ currentSlide + 1 }} / {{ storySlides.length }}
-          </div>
+          <div class="slide-counter">{{ currentSlide + 1 }} / {{ storySlides.length }}</div>
         </div>
       </template>
     </StoryWrapper>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from 'vue';
-import { gsap } from 'gsap';
-import StoryWrapper from '../components/StoryWrapper.vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { gsap } from 'gsap'
+import StoryWrapper from '../components/StoryWrapper.vue'
 
 // Refs
-const storyWrapperRef = ref(null);
-const shareableCardRef = ref(null);
-const showConfetti = ref(false);
+const storyWrapperRef = ref(null)
+const shareableCardRef = ref(null)
+const showConfetti = ref(false)
 
 // Story slides configuration
 const storySlides = ref([
@@ -194,68 +184,69 @@ const storySlides = ref([
   { id: 'top-song', animationType: 'blur-zoom' },
   { id: 'minutes', animationType: 'elastic' },
   { id: 'genres', animationType: 'fade-slide' },
-  { id: 'shareable', animationType: 'morph' } // Special animation for final card
-]);
+  { id: 'shareable', animationType: 'morph' }, // Special animation for final card
+])
 
 // Sample data
 const topGenres = [
   { name: 'Pop', percentage: 35 },
   { name: 'R&B', percentage: 28 },
   { name: 'Electronic', percentage: 22 },
-  { name: 'Hip Hop', percentage: 15 }
-];
+  { name: 'Hip Hop', percentage: 15 },
+]
 
 /**
  * Handle slide change with special logic for final card
  */
 const handleSlideChange = ({ index, direction }) => {
-  console.log(`Slide changed to ${index}, direction: ${direction}`);
-  
+  console.log(`Slide changed to ${index}, direction: ${direction}`)
+
   // Special transition TO the shareable card (from story to card)
   if (index === storySlides.value.length - 1) {
-    triggerShareableCardEntrance();
+    triggerShareableCardEntrance()
   }
-  
+
   // Special transition FROM the shareable card (back to story)
   if (index === storySlides.value.length - 2 && direction === 'previous') {
-    hideShareableCard();
+    hideShareableCard()
   }
-};
+}
 
 /**
  * Trigger special entrance animation for shareable card
  * This is the key transition: Story -> Shareable Card
  */
 const triggerShareableCardEntrance = () => {
-  console.log('Triggering shareable card entrance');
-  
+  console.log('Triggering shareable card entrance')
+
   // Wait a moment for the slide transition to start
   setTimeout(() => {
-    if (!shareableCardRef.value) return;
-    
-    const card = shareableCardRef.value.querySelector('.shareable-card');
-    const actions = shareableCardRef.value.querySelector('.share-actions');
-    
+    if (!shareableCardRef.value) return
+
+    const card = shareableCardRef.value.querySelector('.shareable-card')
+    const actions = shareableCardRef.value.querySelector('.share-actions')
+
     // Create master timeline for coordinated animations
     const tl = gsap.timeline({
       onComplete: () => {
         // Show confetti after card is fully visible
-        showConfetti.value = true;
+        showConfetti.value = true
         setTimeout(() => {
-          showConfetti.value = false;
-        }, 3000);
-      }
-    });
-    
+          showConfetti.value = false
+        }, 3000)
+      },
+    })
+
     // Animate card entrance with 3D transform
-    tl.fromTo(card,
+    tl.fromTo(
+      card,
       {
         opacity: 0,
         scale: 0.3,
         rotationY: -180,
         rotationX: 20,
         z: -500,
-        transformOrigin: '50% 50%'
+        transformOrigin: '50% 50%',
       },
       {
         opacity: 1,
@@ -264,146 +255,148 @@ const triggerShareableCardEntrance = () => {
         rotationX: 0,
         z: 0,
         duration: 1.2,
-        ease: 'back.out(1.5)'
-      }
-    );
-    
+        ease: 'back.out(1.5)',
+      },
+    )
+
     // Animate card stats in sequence
-    const stats = card.querySelectorAll('.card-stat');
+    const stats = card.querySelectorAll('.card-stat')
     stats.forEach((stat, idx) => {
-      tl.fromTo(stat,
+      tl.fromTo(
+        stat,
         {
           opacity: 0,
           y: 30,
-          scale: 0.8
+          scale: 0.8,
         },
         {
           opacity: 1,
           y: 0,
           scale: 1,
           duration: 0.5,
-          ease: 'back.out(2)'
+          ease: 'back.out(2)',
         },
-        `-=${0.8 - idx * 0.2}` // Stagger with overlap
-      );
-    });
-    
+        `-=${0.8 - idx * 0.2}`, // Stagger with overlap
+      )
+    })
+
     // Animate share buttons
-    tl.fromTo(actions,
+    tl.fromTo(
+      actions,
       {
         opacity: 0,
-        y: 50
+        y: 50,
       },
       {
         opacity: 1,
         y: 0,
         duration: 0.6,
-        ease: 'power3.out'
+        ease: 'power3.out',
       },
-      '-=0.3'
-    );
-    
+      '-=0.3',
+    )
+
     // Add subtle floating animation to card
     tl.to(card, {
       y: -10,
       duration: 2,
       ease: 'sine.inOut',
       repeat: -1,
-      yoyo: true
-    });
-  }, 200);
-};
+      yoyo: true,
+    })
+  }, 200)
+}
 
 /**
  * Hide shareable card when navigating away
  */
 const hideShareableCard = () => {
-  showConfetti.value = false;
-  
-  if (!shareableCardRef.value) return;
-  
-  const card = shareableCardRef.value.querySelector('.shareable-card');
-  
+  showConfetti.value = false
+
+  if (!shareableCardRef.value) return
+
+  const card = shareableCardRef.value.querySelector('.shareable-card')
+
   gsap.to(card, {
     scale: 0.8,
     opacity: 0,
     rotationY: 90,
     duration: 0.5,
-    ease: 'power2.in'
-  });
-};
+    ease: 'power2.in',
+  })
+}
 
 /**
  * Handle story completion
  */
 const handleStoryComplete = () => {
-  console.log('Story completed!');
+  console.log('Story completed!')
   // Keep showing the shareable card
-};
+}
 
 /**
  * Get random confetti styles
  */
-const getConfettiStyle = (index) => {
-  const colors = ['#1DB954', '#FF6B6B', '#4ECDC4', '#FFE66D', '#A8E6CF'];
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-  const randomX = Math.random() * 100;
-  const randomDelay = Math.random() * 0.5;
-  const randomDuration = 2 + Math.random() * 2;
-  
+const getConfettiStyle = () => {
+  const colors = ['#1DB954', '#FF6B6B', '#4ECDC4', '#FFE66D', '#A8E6CF']
+  const randomColor = colors[Math.floor(Math.random() * colors.length)]
+  const randomX = Math.random() * 100
+  const randomDelay = Math.random() * 0.5
+  const randomDuration = 2 + Math.random() * 2
+
   return {
     left: `${randomX}%`,
     backgroundColor: randomColor,
     animationDelay: `${randomDelay}s`,
-    animationDuration: `${randomDuration}s`
-  };
-};
+    animationDuration: `${randomDuration}s`,
+  }
+}
 
 /**
  * Handle share action
  */
 const handleShare = () => {
-  console.log('Sharing wrapped...');
-  
+  console.log('Sharing wrapped...')
+
   // Trigger share animation
-  const card = shareableCardRef.value?.querySelector('.shareable-card');
+  const card = shareableCardRef.value?.querySelector('.shareable-card')
   if (card) {
     gsap.to(card, {
       scale: 1.05,
       duration: 0.2,
       yoyo: true,
       repeat: 1,
-      ease: 'power2.inOut'
-    });
+      ease: 'power2.inOut',
+    })
   }
-  
+
   // Implement your share logic here
-  alert('Share functionality - integrate with Web Share API or social platforms');
-};
+  alert('Share functionality - integrate with Web Share API or social platforms')
+}
 
 /**
  * Handle replay action
  */
 const handleReplay = () => {
   if (storyWrapperRef.value) {
-    storyWrapperRef.value.reset();
+    storyWrapperRef.value.reset()
   }
-};
+}
 
 /**
  * Handle close
  */
 const handleClose = () => {
-  console.log('Closing wrapped...');
+  console.log('Closing wrapped...')
   // Implement close logic
-};
+}
 
 /**
  * Component mounted
  */
 onMounted(() => {
-  console.log('Spotify Wrapped Demo mounted');
-});
+  console.log('Spotify Wrapped Demo mounted')
+})
 </script>
 
 <style scoped>
@@ -453,7 +446,7 @@ onMounted(() => {
 }
 
 .gradient-green {
-  background: linear-gradient(135deg, #1DB954 0%, #0f7e36 100%);
+  background: linear-gradient(135deg, #1db954 0%, #0f7e36 100%);
 }
 
 .gradient-orange {
@@ -461,20 +454,26 @@ onMounted(() => {
 }
 
 .gradient-rainbow {
-  background: linear-gradient(135deg, 
-    #667eea 0%, 
-    #764ba2 25%, 
-    #f093fb 50%, 
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
     #f5576c 75%,
-    #1DB954 100%
+    #1db954 100%
   );
   animation: gradient-shift 10s ease infinite;
   background-size: 200% 200%;
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* Typography */
@@ -537,8 +536,13 @@ onMounted(() => {
 }
 
 @keyframes pulse-scale {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* Stats */
@@ -687,7 +691,7 @@ onMounted(() => {
 .card-year {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #1DB954;
+  color: #1db954;
 }
 
 .card-stats {
@@ -704,7 +708,7 @@ onMounted(() => {
 .card-stat-value {
   font-size: 2rem;
   font-weight: 900;
-  color: #1DB954;
+  color: #1db954;
   line-height: 1;
 }
 
@@ -756,7 +760,7 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #1DB954 0%, #0f7e36 100%);
+  background: linear-gradient(135deg, #1db954 0%, #0f7e36 100%);
   color: white;
   box-shadow: 0 10px 30px rgba(29, 185, 84, 0.3);
 }
@@ -873,10 +877,18 @@ onMounted(() => {
   opacity: 0;
 }
 
-.delay-1 { animation-delay: 0.2s; }
-.delay-2 { animation-delay: 0.4s; }
-.delay-3 { animation-delay: 0.6s; }
-.delay-4 { animation-delay: 0.8s; }
+.delay-1 {
+  animation-delay: 0.2s;
+}
+.delay-2 {
+  animation-delay: 0.4s;
+}
+.delay-3 {
+  animation-delay: 0.6s;
+}
+.delay-4 {
+  animation-delay: 0.8s;
+}
 
 @keyframes fadeInUp {
   from {
@@ -890,8 +902,12 @@ onMounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInScale {
@@ -921,19 +937,19 @@ onMounted(() => {
   .slide {
     padding: 1.5rem;
   }
-  
+
   .card-container {
     max-width: 90%;
   }
-  
+
   .shareable-card {
     padding: 2rem 1.5rem;
   }
-  
+
   .card-stats {
     gap: 1rem;
   }
-  
+
   .genre-list {
     max-width: 100%;
   }

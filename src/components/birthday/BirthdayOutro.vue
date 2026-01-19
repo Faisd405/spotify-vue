@@ -7,15 +7,10 @@
           <div class="bow">🎀</div>
         </div>
         <div class="gift-body"></div>
-        
+
         <!-- Gift particles when opened -->
         <div v-if="isOpen" class="gift-particles">
-          <div 
-            v-for="i in 20"
-            :key="i"
-            class="particle"
-            :style="getParticleStyle(i)"
-          >
+          <div v-for="i in 20" :key="i" class="particle" :style="getParticleStyle(i)">
             {{ getParticleEmoji(i) }}
           </div>
         </div>
@@ -26,7 +21,7 @@
         <h2 class="outro-title" ref="titleRef">
           {{ finalMessage }}
         </h2>
-        
+
         <p class="outro-subtitle" ref="subtitleRef">
           {{ subMessage }}
         </p>
@@ -37,7 +32,7 @@
             <span class="btn-icon">📤</span>
             <span>Share Your Story</span>
           </button>
-          
+
           <button class="btn-replay" @click="handleReplay">
             <span class="btn-icon">🔄</span>
             <span>Watch Again</span>
@@ -60,100 +55,104 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from 'vue';
-import { gsap } from 'gsap';
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue'
+import { gsap } from 'gsap'
 
 const props = defineProps({
   finalMessage: {
     type: String,
-    default: 'Here\'s to another amazing year!'
+    default: "Here's to another amazing year!",
   },
   subMessage: {
     type: String,
-    default: 'May your birthday be filled with love, laughter, and unforgettable moments'
+    default: 'May your birthday be filled with love, laughter, and unforgettable moments',
   },
   isActive: {
     type: Boolean,
-    default: false
-  }
-});
+    default: false,
+  },
+})
 
-const emit = defineEmits(['share', 'replay']);
+const emit = defineEmits(['share', 'replay'])
 
 // Refs
-const outroRef = ref(null);
-const giftRef = ref(null);
-const titleRef = ref(null);
-const subtitleRef = ref(null);
-const actionsRef = ref(null);
-const badgesRef = ref(null);
+const outroRef = ref(null)
+const giftRef = ref(null)
+const titleRef = ref(null)
+const subtitleRef = ref(null)
+const actionsRef = ref(null)
+const badgesRef = ref(null)
 
-const isOpen = ref(false);
+const isOpen = ref(false)
 
-const particleEmojis = ['✨', '🎊', '🎉', '💫', '⭐', '🌟', '🎈', '💝'];
+const particleEmojis = ['✨', '🎊', '🎉', '💫', '⭐', '🌟', '🎈', '💝']
 
 /**
  * Get particle emoji
  */
 const getParticleEmoji = (index) => {
-  return particleEmojis[index % particleEmojis.length];
-};
+  return particleEmojis[index % particleEmojis.length]
+}
 
 /**
  * Get particle styles
  */
 const getParticleStyle = (index) => {
-  const angle = (360 / 20) * index;
-  const distance = 80 + Math.random() * 40;
-  const tx = Math.cos(angle * Math.PI / 180) * distance;
-  const ty = Math.sin(angle * Math.PI / 180) * distance;
-  const rotation = Math.random() * 360;
-  const delay = index * 0.03;
-  
+  const angle = (360 / 20) * index
+  const distance = 80 + Math.random() * 40
+  const tx = Math.cos((angle * Math.PI) / 180) * distance
+  const ty = Math.sin((angle * Math.PI) / 180) * distance
+  const rotation = Math.random() * 360
+  const delay = index * 0.03
+
   return {
     '--tx': `${tx}px`,
     '--ty': `${ty}px`,
     '--rotation': `${rotation}deg`,
-    animationDelay: `${delay}s`
-  };
-};
+    animationDelay: `${delay}s`,
+  }
+}
 
 /**
  * Open gift animation
  */
 const openGift = () => {
-  if (isOpen.value) return;
-  
-  isOpen.value = true;
-  
-  const tl = gsap.timeline();
-  
+  if (isOpen.value) return
+
+  isOpen.value = true
+
+  const tl = gsap.timeline()
+
   // Shake gift
   tl.to(giftRef.value, {
     rotation: -5,
     duration: 0.1,
     repeat: 5,
-    yoyo: true
-  });
-  
+    yoyo: true,
+  })
+
   // Pop open
   tl.to('.gift-lid', {
     y: -50,
     rotation: -20,
     duration: 0.5,
-    ease: 'back.out(2)'
-  });
-  
+    ease: 'back.out(2)',
+  })
+
   // Celebrate
-  tl.from('.gift-particles .particle', {
-    scale: 0,
-    opacity: 0,
-    duration: 0.6,
-    stagger: 0.03,
-    ease: 'back.out(1.7)'
-  }, '-=0.3');
-};
+  tl.from(
+    '.gift-particles .particle',
+    {
+      scale: 0,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.03,
+      ease: 'back.out(1.7)',
+    },
+    '-=0.3',
+  )
+}
 
 /**
  * Handle share
@@ -166,10 +165,10 @@ const handleShare = () => {
     yoyo: true,
     repeat: 1,
     onComplete: () => {
-      emit('share');
-    }
-  });
-};
+      emit('share')
+    },
+  })
+}
 
 /**
  * Handle replay
@@ -182,16 +181,16 @@ const handleReplay = () => {
     yoyo: true,
     repeat: 1,
     onComplete: () => {
-      emit('replay');
-    }
-  });
-};
+      emit('replay')
+    },
+  })
+}
 
 /**
  * Play entrance animation
  */
 const playEntranceAnimation = () => {
-  const tl = gsap.timeline();
+  const tl = gsap.timeline()
 
   // Gift box entrance
   tl.from(giftRef.value, {
@@ -199,8 +198,8 @@ const playEntranceAnimation = () => {
     rotation: -180,
     opacity: 0,
     duration: 1,
-    ease: 'back.out(1.7)'
-  });
+    ease: 'back.out(1.7)',
+  })
 
   // Subtle floating
   tl.to(giftRef.value, {
@@ -208,68 +207,87 @@ const playEntranceAnimation = () => {
     duration: 1.5,
     repeat: -1,
     yoyo: true,
-    ease: 'sine.inOut'
-  });
+    ease: 'sine.inOut',
+  })
 
   // Title
-  tl.from(titleRef.value, {
-    y: 30,
-    opacity: 0,
-    duration: 0.8,
-    ease: 'power3.out'
-  }, '-=1.3');
+  tl.from(
+    titleRef.value,
+    {
+      y: 30,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power3.out',
+    },
+    '-=1.3',
+  )
 
   // Subtitle
-  tl.from(subtitleRef.value, {
-    y: 20,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power2.out'
-  }, '-=0.5');
+  tl.from(
+    subtitleRef.value,
+    {
+      y: 20,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power2.out',
+    },
+    '-=0.5',
+  )
 
   // Actions
-  tl.from(actionsRef.value.children, {
-    y: 20,
-    opacity: 0,
-    duration: 0.5,
-    stagger: 0.15,
-    ease: 'back.out(1.5)'
-  }, '-=0.3');
+  tl.from(
+    actionsRef.value.children,
+    {
+      y: 20,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.15,
+      ease: 'back.out(1.5)',
+    },
+    '-=0.3',
+  )
 
   // Badges
-  tl.from(badgesRef.value.children, {
-    scale: 0,
-    opacity: 0,
-    duration: 0.4,
-    stagger: 0.1,
-    ease: 'back.out(1.7)'
-  }, '-=0.4');
+  tl.from(
+    badgesRef.value.children,
+    {
+      scale: 0,
+      opacity: 0,
+      duration: 0.4,
+      stagger: 0.1,
+      ease: 'back.out(1.7)',
+    },
+    '-=0.4',
+  )
 
-  return tl;
-};
+  return tl
+}
 
 /**
  * Watch for active state
  */
-watch(() => props.isActive, (isActive) => {
-  if (isActive) {
-    isOpen.value = false;
-    playEntranceAnimation();
-  }
-});
+watch(
+  () => props.isActive,
+  (isActive) => {
+    if (isActive) {
+      isOpen.value = false
+      playEntranceAnimation()
+    }
+  },
+)
 
 /**
  * Mount
  */
 onMounted(() => {
   if (props.isActive) {
-    playEntranceAnimation();
+    playEntranceAnimation()
   }
-});
+})
 
 defineExpose({
-  playEntranceAnimation
-});
+  playEntranceAnimation,
+})
 </script>
 
 <style scoped>
@@ -288,8 +306,13 @@ defineExpose({
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .outro-container {
@@ -498,34 +521,34 @@ button {
   .outro-container {
     padding: 1.5rem;
   }
-  
+
   .gift-box {
     width: 120px;
     height: 120px;
     margin-bottom: 2rem;
   }
-  
+
   .gift-body {
     height: 80px;
   }
-  
+
   .gift-lid {
     height: 35px;
   }
-  
+
   .bow {
     font-size: 2.5rem;
     top: -20px;
   }
-  
+
   .particle {
     font-size: 1.2rem;
   }
-  
+
   .outro-actions {
     gap: 0.75rem;
   }
-  
+
   button {
     padding: 0.875rem 1.75rem;
     font-size: 0.95rem;

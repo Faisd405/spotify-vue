@@ -1,29 +1,29 @@
 <template>
   <div class="vertical-progress-container">
     <!-- Progress segments for each slide -->
-    <div 
+    <div
       v-for="(segment, index) in segments"
       :key="index"
       class="progress-segment"
       :class="{
         'is-active': index === currentSlide,
         'is-completed': index < currentSlide,
-        'is-upcoming': index > currentSlide
+        'is-upcoming': index > currentSlide,
       }"
       @click="onSegmentClick(index)"
     >
       <!-- Background track -->
       <div class="progress-track"></div>
-      
+
       <!-- Animated fill -->
-      <div 
+      <div
         class="progress-fill"
         :style="getFillStyle(index)"
-        :ref="el => setFillRef(el, index)"
+        :ref="(el) => setFillRef(el, index)"
       ></div>
-      
+
       <!-- Pulse indicator for active segment -->
-      <div 
+      <div
         v-if="index === currentSlide && !isPaused"
         class="progress-pulse"
         :style="getPulseStyle()"
@@ -32,7 +32,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue'
 import { gsap } from 'gsap'
 
@@ -45,20 +45,16 @@ const props = defineProps({
   orientation: {
     type: String,
     default: 'horizontal',
-    validator: v => ['vertical', 'horizontal'].includes(v),
+    validator: (v) => ['vertical', 'horizontal'].includes(v),
   },
 })
 
 const emit = defineEmits(['segment-click', 'slide-change'])
 
 const fillRefs = ref({})
-const segments = computed(() =>
-  Array.from({ length: props.totalSlides })
-)
+const segments = computed(() => Array.from({ length: props.totalSlides }))
 
-const axis = computed(() =>
-  props.orientation === 'vertical' ? 'scaleY' : 'scaleX'
-)
+const axis = computed(() => (props.orientation === 'vertical' ? 'scaleY' : 'scaleX'))
 
 const setFillRef = (el, index) => {
   if (el) fillRefs.value[index] = el
@@ -79,11 +75,11 @@ const getFillStyle = (index) => {
 
 const getPulseStyle = () => {
   const progressPercent = Math.max(2, Math.min(props.progress, 98))
-  
+
   if (props.orientation === 'vertical') {
     return { top: `${progressPercent}%` }
   }
-  
+
   return { left: `${progressPercent}%` }
 }
 
@@ -98,7 +94,7 @@ watch(
   (to, from) => {
     if (from == null || to === from) return
     animateSegmentTransition(from, to)
-  }
+  },
 )
 
 const animateSegmentTransition = (from, to) => {
@@ -144,7 +140,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-    .vertical-progress-container {
+.vertical-progress-container {
   display: flex;
   gap: 8px;
   width: 100%;
@@ -207,8 +203,9 @@ onMounted(() => {
   background: white;
   transform-origin: left center;
   transform: scaleX(0);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.7),
-              0 0 20px rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.7),
+    0 0 20px rgba(255, 255, 255, 0.4);
   transition: box-shadow 0.3s ease;
 }
 
@@ -219,14 +216,16 @@ onMounted(() => {
 
 .progress-segment.is-active .progress-fill {
   background: white;
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.9),
-              0 0 24px rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 0 16px rgba(255, 255, 255, 0.9),
+    0 0 24px rgba(255, 255, 255, 0.5);
 }
 
 .progress-segment.is-completed .progress-fill {
   background: white;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.7),
-              0 0 20px rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.7),
+    0 0 20px rgba(255, 255, 255, 0.4);
 }
 
 .progress-pulse {
@@ -243,9 +242,14 @@ onMounted(() => {
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(255,255,255,.6); }
-  70% { box-shadow: 0 0 0 6px rgba(255,255,255,0); }
-  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
 }
-
 </style>

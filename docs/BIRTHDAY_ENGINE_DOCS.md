@@ -31,15 +31,18 @@ src/
 ## 🎬 Slide System
 
 ### **1. BirthdayIntro.vue**
+
 **Purpose:** Welcome the birthday person with cinematic entrance
 
 **Features:**
+
 - Floating emoji icon with bounce animation
 - Personalized name with gradient text
 - Animated background circles
 - Particle burst effect
 
 **Props:**
+
 ```javascript
 {
   recipientName: String,    // Default: 'Faiz'
@@ -49,6 +52,7 @@ src/
 ```
 
 **GSAP Animations:**
+
 - Background circles: `back.out(1.7)` stagger
 - Icon: Rotation + scale bounce
 - Text: Sequential fade-up with stagger
@@ -57,15 +61,18 @@ src/
 ---
 
 ### **2. BirthdayMemories.vue**
+
 **Purpose:** Show year statistics with animated counters
 
 **Features:**
+
 - 2×2 grid of memory cards (glassmorphism)
 - Counting animation from 0 to target
 - Shimmer effect on cards
 - Inspirational quote
 
 **Props:**
+
 ```javascript
 {
   memories: Array,          // [{ icon, count, label }]
@@ -75,32 +82,37 @@ src/
 ```
 
 **GSAP Animations:**
+
 - Cards: 3D rotation entrance with `back.out(1.5)`
 - Numbers: Easing counter animation
 - Quote: Delayed fade-in
 
 **Default Memories:**
+
 ```javascript
-[
+;[
   { icon: '🎬', count: '47', label: 'Movies Watched' },
   { icon: '☕', count: '156', label: 'Coffee Dates' },
   { icon: '🎵', count: '2,847', label: 'Songs Shared' },
-  { icon: '📸', count: '289', label: 'Photos Taken' }
+  { icon: '📸', count: '289', label: 'Photos Taken' },
 ]
 ```
 
 ---
 
 ### **3. BirthdayMessage.vue**
+
 **Purpose:** Display heartfelt personal message
 
 **Features:**
+
 - Scrollable multi-line message
 - Floating hearts animation
 - Sparkle decorations
 - Sender signature
 
 **Props:**
+
 ```javascript
 {
   message: String,          // Multi-sentence message
@@ -110,6 +122,7 @@ src/
 ```
 
 **GSAP Animations:**
+
 - Icon: Rotating bounce entrance
 - Sparkles: Random burst with twinkle
 - Message lines: Sequential typewriter effect
@@ -118,15 +131,18 @@ src/
 ---
 
 ### **4. BirthdayWish.vue**
+
 **Purpose:** Interactive candle blowing experience
 
 **Features:**
+
 - Animated candle with flame flicker
 - Tap/click to blow out
 - Confetti burst on blow
 - "Wish granted" success message
 
 **Props:**
+
 ```javascript
 {
   wishText: String,
@@ -135,17 +151,20 @@ src/
 ```
 
 **Events:**
+
 ```javascript
 @wish-blown  // Emitted when candle is blown out
 ```
 
 **GSAP Animations:**
+
 - Candle: Grows from bottom with `back.out`
 - Flame: Flicker loop with `sine.inOut`
 - Blow sequence: Shake → Scale → Disappear
 - Confetti: Radial burst with rotation
 
 **Interaction Flow:**
+
 1. Candle appears with flame
 2. User taps anywhere
 3. Flame flickers and disappears
@@ -156,15 +175,18 @@ src/
 ---
 
 ### **5. BirthdayOutro.vue**
+
 **Purpose:** Final celebration with share actions
 
 **Features:**
+
 - Animated gift box (tap to open)
 - Share & Replay buttons
 - Emoria branding badges
 - Gradient background animation
 
 **Props:**
+
 ```javascript
 {
   finalMessage: String,
@@ -174,12 +196,14 @@ src/
 ```
 
 **Events:**
+
 ```javascript
 @share   // User clicked share button
 @replay  // User clicked replay button
 ```
 
 **GSAP Animations:**
+
 - Gift: Rotation entrance + floating loop
 - Gift opening: Lid pops off with particles
 - Buttons: Staggered entrance with bounce
@@ -195,13 +219,13 @@ Each slide component exposes a `playEntranceAnimation()` method:
 
 ```javascript
 // Example: Custom timing in parent
-const slide = ref(null);
+const slide = ref(null)
 
 watch(isActive, (active) => {
   if (active) {
-    slide.value.playEntranceAnimation();
+    slide.value.playEntranceAnimation()
   }
-});
+})
 ```
 
 ### **GSAP Timeline Composition**
@@ -210,23 +234,23 @@ All slides use GSAP timelines for orchestrated animations:
 
 ```javascript
 const playEntranceAnimation = () => {
-  const tl = gsap.timeline();
-  
+  const tl = gsap.timeline()
+
   // Element 1
-  tl.from(element1, { opacity: 0, y: 30, duration: 0.6 });
-  
+  tl.from(element1, { opacity: 0, y: 30, duration: 0.6 })
+
   // Element 2 (overlapping)
-  tl.from(element2, { scale: 0, duration: 0.5 }, '-=0.3');
-  
+  tl.from(element2, { scale: 0, duration: 0.5 }, '-=0.3')
+
   // Element 3 (stagger)
-  tl.from('.items', { 
-    y: 20, 
+  tl.from('.items', {
+    y: 20,
     opacity: 0,
-    stagger: 0.1 
-  });
-  
-  return tl;
-};
+    stagger: 0.1,
+  })
+
+  return tl
+}
 ```
 
 ---
@@ -241,7 +265,7 @@ The `EmoriaBirthdayDemo.vue` enforces Instagram Stories aspect ratio:
 .story-frame {
   width: 100%;
   max-width: 480px;
-  aspect-ratio: 9 / 16;  /* Lock to mobile portrait */
+  aspect-ratio: 9 / 16; /* Lock to mobile portrait */
 }
 
 /* Mobile: Full screen */
@@ -249,7 +273,7 @@ The `EmoriaBirthdayDemo.vue` enforces Instagram Stories aspect ratio:
   .story-frame {
     width: 100vw;
     height: 100vh;
-    height: 100dvh;  /* Dynamic viewport */
+    height: 100dvh; /* Dynamic viewport */
     aspect-ratio: auto;
   }
 }
@@ -275,13 +299,13 @@ handleTouchStart(e) {
 
 handleTouchEnd() {
   const deltaX = touchEndX - touchStartX;
-  
+
   if (deltaX > threshold) {
     previousSlide();  // Swipe right
   } else if (deltaX < -threshold) {
     nextSlide();      // Swipe left
   }
-  
+
   resume();  // Resume after release
 }
 ```
@@ -295,39 +319,42 @@ handleTouchEnd() {
 The core orchestrator manages:
 
 1. **Current Slide Index**
+
    ```javascript
-   const currentSlide = ref(0);
+   const currentSlide = ref(0)
    ```
 
 2. **Auto-Progress Timer**
+
    ```javascript
    const progressTimeline = gsap.to(progress, {
      value: 100,
      duration: slideDuration,
      ease: 'none',
-     onComplete: () => nextSlide()
-   });
+     onComplete: () => nextSlide(),
+   })
    ```
 
 3. **Pause/Resume**
+
    ```javascript
    const pause = () => {
-     progressTimeline.pause();
-     isPaused.value = true;
-   };
+     progressTimeline.pause()
+     isPaused.value = true
+   }
    ```
 
 4. **Navigation**
    ```javascript
    const nextSlide = async () => {
-     if (isTransitioning.value) return;
-     
-     isTransitioning.value = true;
-     currentSlide.value++;
-     
-     await gsap.to({}, { duration: 0.3 });  // Transition delay
-     startProgress();
-   };
+     if (isTransitioning.value) return
+
+     isTransitioning.value = true
+     currentSlide.value++
+
+     await gsap.to({}, { duration: 0.3 }) // Transition delay
+     startProgress()
+   }
    ```
 
 ---
@@ -341,8 +368,8 @@ The core orchestrator manages:
   <EmoriaBirthdayDemo />
 </template>
 
-<script setup>
-import EmoriaBirthdayDemo from './examples/EmoriaBirthdayDemo.vue';
+<script setup lang="ts">
+import EmoriaBirthdayDemo from './examples/EmoriaBirthdayDemo.vue'
 </script>
 ```
 
@@ -350,39 +377,31 @@ import EmoriaBirthdayDemo from './examples/EmoriaBirthdayDemo.vue';
 
 ```vue
 <template>
-  <StoryWrapper
-    :slides="slides"
-    :slide-duration="6"
-    @slide-change="handleSlideChange"
-  >
+  <StoryWrapper :slides="slides" :slide-duration="6" @slide-change="handleSlideChange">
     <template #slide-0="{ isActive }">
-      <BirthdayIntro
-        recipient-name="Alex"
-        birth-date="March 15, 2026"
-        :is-active="isActive"
-      />
+      <BirthdayIntro recipient-name="Alex" birth-date="March 15, 2026" :is-active="isActive" />
     </template>
-    
+
     <!-- Other slides... -->
   </StoryWrapper>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const slides = ref([
   { id: 'intro', animationType: 'scale-fade' },
   { id: 'memories', animationType: 'blur-zoom' },
   // ...
-]);
+])
 
 const handleSlideChange = ({ index, direction }) => {
-  console.log(`Now on slide ${index}`);
-  
+  console.log(`Now on slide ${index}`)
+
   // Track analytics
-  trackEvent('birthday_slide_view', { 
+  trackEvent('birthday_slide_view', {
     slideIndex: index,
-    slideName: slides.value[index].id 
-  });
-};
+    slideName: slides.value[index].id,
+  })
+}
 </script>
 ```
 
@@ -423,8 +442,8 @@ const memories = ref([
   { icon: '🍕', count: '73', label: 'Pizza Nights' },
   { icon: '🎮', count: '429', label: 'Games Played' },
   { icon: '🏃', count: '1,234', label: 'Miles Run' },
-  { icon: '📚', count: '42', label: 'Books Read' }
-]);
+  { icon: '📚', count: '42', label: 'Books Read' },
+])
 ```
 
 ### **4. Add New Slide**
@@ -439,13 +458,13 @@ const memories = ref([
 </template>
 
 <!-- 2. Register in demo -->
-<script setup>
-import BirthdayPhotos from '../components/birthday/BirthdayPhotos.vue';
+<script setup lang="ts">
+import BirthdayPhotos from '../components/birthday/BirthdayPhotos.vue'
 
 const slides = ref([
   // ...existing slides
-  { id: 'photos', animationType: 'flip' }
-]);
+  { id: 'photos', animationType: 'flip' },
+])
 </script>
 
 <!-- 3. Add template slot -->
@@ -475,21 +494,24 @@ All animations use GPU-accelerated properties:
 ```javascript
 onUnmounted(() => {
   if (progressTimeline) {
-    progressTimeline.kill();
+    progressTimeline.kill()
   }
-  gsap.killTweensOf('*');
-});
+  gsap.killTweensOf('*')
+})
 ```
 
 ### **3. Lazy Loading**
 
 ```javascript
 // Only animate when slide becomes active
-watch(() => props.isActive, (isActive) => {
-  if (isActive) {
-    playEntranceAnimation();
-  }
-});
+watch(
+  () => props.isActive,
+  (isActive) => {
+    if (isActive) {
+      playEntranceAnimation()
+    }
+  },
+)
 ```
 
 ---
@@ -514,16 +536,16 @@ const trackSlideView = ({ index, slide }) => {
   gtag('event', 'slide_view', {
     slide_index: index,
     slide_name: slide.id,
-    timestamp: Date.now()
-  });
-};
+    timestamp: Date.now(),
+  })
+}
 
 const trackCompletion = () => {
   gtag('event', 'story_complete', {
     duration_seconds: totalDuration,
-    completion_rate: 100
-  });
-};
+    completion_rate: 100,
+  })
+}
 ```
 
 ---
@@ -534,12 +556,12 @@ const trackCompletion = () => {
 
 ```javascript
 const loadBirthdayData = async (userId) => {
-  const data = await fetch(`/api/birthday/${userId}`);
-  
-  recipientName.value = data.name;
-  memories.value = data.yearStats;
-  personalMessage.value = data.customMessage;
-};
+  const data = await fetch(`/api/birthday/${userId}`)
+
+  recipientName.value = data.name
+  memories.value = data.yearStats
+  personalMessage.value = data.customMessage
+}
 ```
 
 ### **2. Video Backgrounds**
@@ -555,19 +577,19 @@ const loadBirthdayData = async (userId) => {
 ### **3. Audio Integration**
 
 ```javascript
-import { Howl } from 'howler';
+import { Howl } from 'howler'
 
 const bgMusic = new Howl({
   src: ['/audio/birthday-theme.mp3'],
   loop: true,
-  volume: 0.5
-});
+  volume: 0.5,
+})
 
 onMounted(() => {
   if (autoStart) {
-    bgMusic.play();
+    bgMusic.play()
   }
-});
+})
 ```
 
 ---
@@ -593,12 +615,14 @@ onMounted(() => {
 ## 🎯 Next Steps
 
 1. **Add Tailwind CSS** (if needed):
+
    ```bash
    npm install -D tailwindcss postcss autoprefixer
    npx tailwindcss init
    ```
 
 2. **Deploy**:
+
    ```bash
    npm run build
    ```

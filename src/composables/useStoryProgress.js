@@ -17,7 +17,8 @@ export function useStoryProgress(options = {}) {
     totalSlides = 0,
     duration = 5,
     onSlideChange = () => {},
-    onComplete = () => {}
+    onComplete = () => {},
+    getSlideConfig = () => ({})
   } = options;
 
   // State
@@ -25,6 +26,7 @@ export function useStoryProgress(options = {}) {
   const isPaused = ref(false);
   const isTransitioning = ref(false);
   const progress = ref(0);
+  const waitingForAction = ref(false);
 
   // Timeline for progress animation
   let progressTimeline = null;
@@ -37,6 +39,19 @@ export function useStoryProgress(options = {}) {
     if (progressTimeline) {
       progressTimeline.kill();
     }
+
+    // Check if current slide requires user action
+    const slideConfig = getSlideConfig(currentSlide.value);
+    const requiresAction = slideConfig?.requiresAction || slideConfig?.hasInteraction;
+
+    if (requiresAction) {
+      // Don't start auto-progress, wait for user action
+      waitingForAction.value = true;
+      progress.value = 0;
+      return;
+    }
+
+    waitingForAction.value = false;
 
     progressTimeline = gsap.timeline({
       onUpdate: () => {
@@ -184,6 +199,21 @@ export function useStoryProgress(options = {}) {
   };
 
   /**
+   * Complete action on interactive slide and move to next
+   */
+  const completeAction = () => {
+    if (waitingForAction.value) {
+      waitingForAction.value = false;
+      // Small delay before advancing
+      gsap.delayedCall(0.8, () => {
+        if (currentSlide.value < totalSlides - 1) {
+          nextSlide();
+        }
+      });
+    }
+  };
+
+  /**
    * Cleanup on unmount
    */
   const cleanup = () => {
@@ -208,6 +238,7 @@ export function useStoryProgress(options = {}) {
     progress,
     isPaused,
     isTransitioning,
+    waitingForAction,
     
     // Computed
     isFirstSlide,
@@ -224,6 +255,7 @@ export function useStoryProgress(options = {}) {
     resume,
     togglePause,
     reset,
+    completeAction,
     cleanup
   };
 }

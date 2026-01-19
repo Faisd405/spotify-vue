@@ -6,13 +6,8 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import EmoriaBirthdayDemo from './examples/EmoriaBirthdayDemo.vue';
-import SpotifyWrappedDemo from './examples/SpotifyWrappedDemo.vue';
-
-// Switch demo: 'birthday' or 'spotify'
-const currentDemo = ref('birthday');
+<script setup lang="ts">
+import EmoriaBirthdayDemo from './examples/EmoriaBirthdayDemo.vue'
 </script>
 
 <style>
@@ -24,7 +19,8 @@ const currentDemo = ref('birthday');
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #000;

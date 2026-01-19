@@ -29,60 +29,60 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from "vue";
-import { gsap } from "gsap";
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue'
+import { gsap } from 'gsap'
 
 const props = defineProps({
   memories: {
     type: Array,
     default: () => [
-      { icon: "🎬", count: "47", label: "Movies Watched" },
-      { icon: "☕", count: "156", label: "Coffee Dates" },
-      { icon: "🎵", count: "2,847", label: "Songs Shared" },
-      { icon: "📸", count: "289", label: "Photos Taken" },
+      { icon: '🎬', count: '47', label: 'Movies Watched' },
+      { icon: '☕', count: '156', label: 'Coffee Dates' },
+      { icon: '🎵', count: '2,847', label: 'Songs Shared' },
+      { icon: '📸', count: '289', label: 'Photos Taken' },
     ],
   },
   quote: {
     type: String,
-    default: "Every moment with you is a celebration",
+    default: 'Every moment with you is a celebration',
   },
   isActive: {
     type: Boolean,
     default: false,
   },
-});
+})
 
 // Refs
-const memoriesRef = ref(null);
-const headerRef = ref(null);
-const gridRef = ref(null);
-const quoteRef = ref(null);
-const cardRefs = ref([]);
+const memoriesRef = ref(null)
+const headerRef = ref(null)
+const gridRef = ref(null)
+const quoteRef = ref(null)
+const cardRefs = ref([])
 
 /**
  * Set card ref
  */
 const setCardRef = (el, index) => {
   if (el) {
-    cardRefs.value[index] = el;
+    cardRefs.value[index] = el
   }
-};
+}
 
 /**
  * Play entrance animation
  */
 const playEntranceAnimation = () => {
-  const tl = gsap.timeline();
+  const tl = gsap.timeline()
 
   // Header
-  tl.from(headerRef.value.querySelectorAll(".label, .title"), {
+  tl.from(headerRef.value.querySelectorAll('.label, .title'), {
     y: 30,
     opacity: 0,
     duration: 0.6,
     stagger: 0.2,
-    ease: "power3.out",
-  });
+    ease: 'power3.out',
+  })
 
   // Cards with stagger and counter animation
   tl.from(
@@ -95,36 +95,36 @@ const playEntranceAnimation = () => {
       duration: 0.6,
       stagger: {
         each: 0.15,
-        from: "start",
+        from: 'start',
       },
-      ease: "back.out(1.5)",
+      ease: 'back.out(1.5)',
     },
-    "-=0.3",
-  );
+    '-=0.3',
+  )
 
   // Animate numbers counting up
   cardRefs.value.forEach((card, index) => {
-    const countElement = card.querySelector(".memory-count");
-    const targetValue = props.memories[index].count.replace(/,/g, "");
-    const hasComma = props.memories[index].count.includes(",");
+    const countElement = card.querySelector('.memory-count')
+    const targetValue = props.memories[index].count.replace(/,/g, '')
+    const hasComma = props.memories[index].count.includes(',')
 
-    const obj = { value: 0 };
+    const obj = { value: 0 }
     tl.to(
       obj,
       {
         value: parseInt(targetValue),
         duration: 1.5,
-        ease: "power2.out",
+        ease: 'power2.out',
         onUpdate: () => {
-          const displayValue = Math.floor(obj.value);
+          const displayValue = Math.floor(obj.value)
           countElement.textContent = hasComma
             ? displayValue.toLocaleString()
-            : displayValue.toString();
+            : displayValue.toString()
         },
       },
-      "-=1.2",
-    );
-  });
+      '-=1.2',
+    )
+  })
 
   // Quote
   tl.from(
@@ -133,13 +133,13 @@ const playEntranceAnimation = () => {
       y: 20,
       opacity: 0,
       duration: 0.8,
-      ease: "power2.out",
+      ease: 'power2.out',
     },
-    "-=0.8",
-  );
+    '-=0.8',
+  )
 
-  return tl;
-};
+  return tl
+}
 
 /**
  * Watch for active state
@@ -148,23 +148,23 @@ watch(
   () => props.isActive,
   (isActive) => {
     if (isActive) {
-      playEntranceAnimation();
+      playEntranceAnimation()
     }
   },
-);
+)
 
 /**
  * Mount
  */
 onMounted(() => {
   if (props.isActive) {
-    playEntranceAnimation();
+    playEntranceAnimation()
   }
-});
+})
 
 defineExpose({
   playEntranceAnimation,
-});
+})
 </script>
 
 <style scoped>
@@ -238,18 +238,13 @@ defineExpose({
 }
 
 .memory-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   transform: rotate(45deg);
   animation: shine 3s infinite;
 }

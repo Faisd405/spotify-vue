@@ -12,7 +12,7 @@
       <!-- Wish text -->
       <div class="wish-content">
         <h2 class="wish-title" ref="titleRef">Make a Wish</h2>
-        
+
         <div class="wish-text" ref="textRef">
           <p class="wish-line">{{ wishText }}</p>
         </div>
@@ -26,12 +26,7 @@
 
       <!-- Confetti after blow -->
       <div v-if="isBlown" class="confetti-burst" ref="confettiRef">
-        <div 
-          v-for="i in 30"
-          :key="i"
-          class="confetti-piece"
-          :style="getConfettiStyle(i)"
-        ></div>
+        <div v-for="i in 30" :key="i" class="confetti-piece" :style="getConfettiStyle(i)"></div>
       </div>
 
       <!-- Success message -->
@@ -45,113 +40,129 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from 'vue';
-import { gsap } from 'gsap';
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue'
+import { gsap } from 'gsap'
 
 const props = defineProps({
   wishText: {
     type: String,
-    default: 'May all your dreams come true this year and beyond'
+    default: 'May all your dreams come true this year and beyond',
   },
   isActive: {
     type: Boolean,
-    default: false
-  }
-});
+    default: false,
+  },
+})
 
-const emit = defineEmits(['wish-blown']);
+const emit = defineEmits(['wish-blown'])
 
 // Refs
-const wishRef = ref(null);
-const candleRef = ref(null);
-const flameRef = ref(null);
-const titleRef = ref(null);
-const textRef = ref(null);
-const instructionRef = ref(null);
-const confettiRef = ref(null);
-const successRef = ref(null);
+const wishRef = ref(null)
+const candleRef = ref(null)
+const flameRef = ref(null)
+const titleRef = ref(null)
+const textRef = ref(null)
+const instructionRef = ref(null)
+const confettiRef = ref(null)
+const successRef = ref(null)
 
-const isBlown = ref(false);
+const isBlown = ref(false)
 
 /**
  * Get confetti styles
  */
 const getConfettiStyle = (index) => {
-  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7dc6f', '#bb8fce', '#85c1e2'];
-  const angle = (360 / 30) * index;
-  const distance = 150 + Math.random() * 100;
-  
+  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7dc6f', '#bb8fce', '#85c1e2']
+  const angle = (360 / 30) * index
+  const distance = 150 + Math.random() * 100
+
   return {
     backgroundColor: colors[index % colors.length],
-    '--tx': `${Math.cos(angle * Math.PI / 180) * distance}px`,
-    '--ty': `${Math.sin(angle * Math.PI / 180) * distance}px`,
-    '--rotation': `${Math.random() * 720}deg`
-  };
-};
+    '--tx': `${Math.cos((angle * Math.PI) / 180) * distance}px`,
+    '--ty': `${Math.sin((angle * Math.PI) / 180) * distance}px`,
+    '--rotation': `${Math.random() * 720}deg`,
+  }
+}
 
 /**
  * Play entrance animation
  */
 const playEntranceAnimation = () => {
-  const tl = gsap.timeline();
+  const tl = gsap.timeline()
 
   // Candle grows from bottom
   tl.from(candleRef.value, {
     scaleY: 0,
     transformOrigin: 'bottom center',
     duration: 0.8,
-    ease: 'back.out(1.5)'
-  });
+    ease: 'back.out(1.5)',
+  })
 
   // Flame appears
-  tl.from(flameRef.value, {
-    scale: 0,
-    opacity: 0,
-    duration: 0.4,
-    ease: 'back.out(2)'
-  }, '-=0.2');
+  tl.from(
+    flameRef.value,
+    {
+      scale: 0,
+      opacity: 0,
+      duration: 0.4,
+      ease: 'back.out(2)',
+    },
+    '-=0.2',
+  )
 
   // Title
-  tl.from(titleRef.value, {
-    y: 30,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power3.out'
-  }, '-=0.3');
+  tl.from(
+    titleRef.value,
+    {
+      y: 30,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power3.out',
+    },
+    '-=0.3',
+  )
 
   // Wish text
-  tl.from(textRef.value, {
-    y: 20,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power2.out'
-  }, '-=0.3');
+  tl.from(
+    textRef.value,
+    {
+      y: 20,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power2.out',
+    },
+    '-=0.3',
+  )
 
   // Instruction
-  tl.from(instructionRef.value, {
-    y: 20,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power2.out'
-  }, '-=0.3');
+  tl.from(
+    instructionRef.value,
+    {
+      y: 20,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power2.out',
+    },
+    '-=0.3',
+  )
 
-  return tl;
-};
+  return tl
+}
 
 /**
  * Blow out candle
  */
 const blowCandle = () => {
-  if (isBlown.value) return;
+  if (isBlown.value) return
 
-  isBlown.value = true;
-  
+  isBlown.value = true
+
   const tl = gsap.timeline({
     onComplete: () => {
-      emit('wish-blown');
-    }
-  });
+      emit('wish-blown')
+    },
+  })
 
   // Flame flickers and disappears
   tl.to(flameRef.value, {
@@ -159,28 +170,36 @@ const blowCandle = () => {
     scaleY: 0.5,
     duration: 0.1,
     repeat: 3,
-    yoyo: true
-  });
+    yoyo: true,
+  })
 
   tl.to(flameRef.value, {
     scale: 0,
     opacity: 0,
     duration: 0.3,
-    ease: 'power2.in'
-  });
+    ease: 'power2.in',
+  })
 
   // Hide instruction
-  tl.to(instructionRef.value, {
-    opacity: 0,
-    y: -10,
-    duration: 0.3
-  }, '-=0.3');
+  tl.to(
+    instructionRef.value,
+    {
+      opacity: 0,
+      y: -10,
+      duration: 0.3,
+    },
+    '-=0.3',
+  )
 
   // Smoke effect (scale up candle body slightly)
-  tl.to('.candle-body', {
-    opacity: 0.5,
-    duration: 0.5
-  }, '-=0.2');
+  tl.to(
+    '.candle-body',
+    {
+      opacity: 0.5,
+      duration: 0.5,
+    },
+    '-=0.2',
+  )
 
   // Success message appears
   setTimeout(() => {
@@ -190,35 +209,38 @@ const blowCandle = () => {
         rotation: -180,
         opacity: 0,
         duration: 0.8,
-        ease: 'back.out(2)'
-      });
+        ease: 'back.out(2)',
+      })
     }
-  }, 500);
-};
+  }, 500)
+}
 
 /**
  * Watch for active state
  */
-watch(() => props.isActive, (isActive) => {
-  if (isActive) {
-    isBlown.value = false;
-    playEntranceAnimation();
-  }
-});
+watch(
+  () => props.isActive,
+  (isActive) => {
+    if (isActive) {
+      isBlown.value = false
+      playEntranceAnimation()
+    }
+  },
+)
 
 /**
  * Mount
  */
 onMounted(() => {
   if (props.isActive) {
-    playEntranceAnimation();
+    playEntranceAnimation()
   }
-});
+})
 
 defineExpose({
   playEntranceAnimation,
-  blowCandle
-});
+  blowCandle,
+})
 </script>
 
 <style scoped>
@@ -261,10 +283,11 @@ defineExpose({
   transform: translateX(-50%);
   width: 20px;
   height: 35px;
-  background: radial-gradient(circle at 50% 60%, 
-    #fff 0%, 
-    #ffd700 20%, 
-    #ff6b00 60%, 
+  background: radial-gradient(
+    circle at 50% 60%,
+    #fff 0%,
+    #ffd700 20%,
+    #ff6b00 60%,
     transparent 100%
   );
   border-radius: 50% 50% 20% 20%;
@@ -274,8 +297,12 @@ defineExpose({
 }
 
 @keyframes flame-flicker {
-  0% { transform: translateX(-50%) scaleY(1) scaleX(1); }
-  100% { transform: translateX(-50%) scaleY(1.1) scaleX(0.95); }
+  0% {
+    transform: translateX(-50%) scaleY(1) scaleX(1);
+  }
+  100% {
+    transform: translateX(-50%) scaleY(1.1) scaleX(0.95);
+  }
 }
 
 .candle-body {
@@ -332,8 +359,13 @@ defineExpose({
 }
 
 @keyframes bounce-instruction {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .instruction-text {
@@ -351,8 +383,15 @@ defineExpose({
 }
 
 @keyframes tap-pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.8; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
 }
 
 /* Confetti */
@@ -398,8 +437,13 @@ defineExpose({
 }
 
 @keyframes success-bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
 }
 
 .success-text {
@@ -430,20 +474,20 @@ defineExpose({
   .wish-container {
     padding: 1.5rem;
   }
-  
+
   .candle-wrapper {
     margin-bottom: 2rem;
   }
-  
+
   .candle {
     width: 50px;
   }
-  
+
   .candle-body {
     width: 50px;
     height: 100px;
   }
-  
+
   .success-icon {
     font-size: 4rem;
   }

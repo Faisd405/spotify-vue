@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     class="story-wrapper"
     ref="wrapperRef"
     @touchstart="handleTouchStart"
@@ -17,7 +17,7 @@
         :clickable="allowProgressClick"
         @segment-click="goToSlide"
       />
-      
+
       <!-- Optional header slot -->
       <slot name="header" :current-slide="currentSlide" />
     </div>
@@ -35,12 +35,14 @@
         @animation-start="handleAnimationStart"
       >
         <template #default="{ isActive, triggerAnimation }">
-          <slot 
+          <slot
             :name="`slide-${index}`"
             :slide="slide"
             :index="index"
             :is-active="isActive"
             :trigger-animation="triggerAnimation"
+            :complete-action="completeAction"
+            :waiting-for-action="waitingForAction"
           >
             <!-- Default slide content -->
             <div class="default-slide-content" :style="{ padding: props.paddingContent }">
@@ -53,21 +55,13 @@
     </div>
 
     <!-- Navigation Overlays (invisible touch zones) -->
-    <div 
-      v-if="!disableNavigation"
-      class="nav-overlay nav-previous"
-      @click.stop="previousSlide"
-    />
-    <div 
-      v-if="!disableNavigation"
-      class="nav-overlay nav-next"
-      @click.stop="nextSlide"
-    />
+    <div v-if="!disableNavigation" class="nav-overlay nav-previous" @click.stop="previousSlide" />
+    <div v-if="!disableNavigation" class="nav-overlay nav-next" @click.stop="nextSlide" />
 
     <!-- Optional footer slot -->
     <div class="story-footer">
-      <slot 
-        name="footer" 
+      <slot
+        name="footer"
         :current-slide="currentSlide"
         :is-paused="isPaused"
         :toggle-pause="togglePause"
@@ -85,84 +79,85 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import { gsap } from 'gsap';
-import VerticalProgressBar from './VerticalProgressBar.vue';
-import StorySlide from './StorySlide.vue';
-import { useStoryProgress } from '../composables/useStoryProgress';
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { gsap } from 'gsap'
+import VerticalProgressBar from './VerticalProgressBar.vue'
+import StorySlide from './StorySlide.vue'
+import { useStoryProgress } from '../composables/useStoryProgress'
 
 const props = defineProps({
   slides: {
     type: Array,
     required: true,
-    validator: (slides) => slides.length > 0
+    validator: (slides) => slides.length > 0,
   },
   slideDuration: {
     type: Number,
-    default: 10
+    default: 10,
   },
   animationDuration: {
     type: Number,
-    default: 0.6
+    default: 0.6,
   },
   autoStart: {
     type: Boolean,
-    default: true
+    default: true,
   },
   loop: {
     type: Boolean,
-    default: false
+    default: false,
   },
   pauseOnHover: {
     type: Boolean,
-    default: false
+    default: false,
   },
   allowProgressClick: {
     type: Boolean,
-    default: true
+    default: true,
   },
   disableNavigation: {
     type: Boolean,
-    default: false
+    default: false,
   },
   swipeThreshold: {
     type: Number,
-    default: 50
+    default: 50,
   },
   defaultAnimationType: {
     type: String,
-    default: 'fade-slide'
+    default: 'fade-slide',
   },
   paddingContent: {
     type: String,
-    default: '2rem'
-  }
-});
+    default: '2rem',
+  },
+})
 
-const emit = defineEmits([
-  'slide-change',
-  'story-complete',
-  'story-start',
-  'pause',
-  'resume'
-]);
+const emit = defineEmits(['slide-change', 'story-complete', 'story-start', 'pause', 'resume'])
 
 // Refs
-const wrapperRef = ref(null);
-const slidesContainer = ref(null);
-const isLoading = ref(false);
-const transitionDirection = ref('next');
+const wrapperRef = ref(null)
+const slidesContainer = ref(null)
+const isLoading = ref(false)
+const transitionDirection = ref('next')
 
 // Touch handling
-const touchStartX = ref(0);
-const touchStartY = ref(0);
-const touchEndX = ref(0);
-const touchEndY = ref(0);
-const isSwiping = ref(false);
+const touchStartX = ref(0)
+const touchStartY = ref(0)
+const touchEndX = ref(0)
+const touchEndY = ref(0)
+const isSwiping = ref(false)
 
 // Computed
-const totalSlides = computed(() => props.slides.length);
+const totalSlides = computed(() => props.slides.length)
+
+/**
+ * Get slide configuration
+ */
+const getSlideConfig = (index) => {
+  return props.slides[index] || {}
+}
 
 /**
  * Story progress composable
@@ -174,6 +169,7 @@ const {
   isTransitioning,
   isFirstSlide,
   isLastSlide,
+  waitingForAction,
   startProgress,
   nextSlide: goNext,
   previousSlide: goPrevious,
@@ -181,42 +177,44 @@ const {
   pause,
   resume,
   togglePause,
-  reset
+  reset,
+  completeAction,
 } = useStoryProgress({
   totalSlides: totalSlides.value,
   duration: props.slideDuration,
   onSlideChange: handleSlideChange,
-  onComplete: handleStoryComplete
-});
+  onComplete: handleStoryComplete,
+  getSlideConfig,
+})
 
 /**
  * Get animation type for specific slide
  */
 const getAnimationType = (index) => {
-  const slide = props.slides[index];
-  return slide.animationType || props.defaultAnimationType;
-};
+  const slide = props.slides[index]
+  return slide.animationType || props.defaultAnimationType
+}
 
 /**
  * Handle slide change
  */
 function handleSlideChange(newIndex, direction) {
-  transitionDirection.value = direction;
+  transitionDirection.value = direction
   emit('slide-change', {
     index: newIndex,
     slide: props.slides[newIndex],
-    direction
-  });
+    direction,
+  })
 }
 
 /**
  * Handle story completion
  */
 function handleStoryComplete() {
-  emit('story-complete');
-  
+  emit('story-complete')
+
   if (props.loop) {
-    reset();
+    reset()
   }
 }
 
@@ -225,116 +223,116 @@ function handleStoryComplete() {
  */
 const nextSlide = () => {
   if (!isTransitioning.value && !isLastSlide.value) {
-    goNext();
+    goNext()
   }
-};
+}
 
 const previousSlide = () => {
   if (!isTransitioning.value && !isFirstSlide.value) {
-    goPrevious();
+    goPrevious()
   }
-};
+}
 
 const goToSlide = (index) => {
   if (!isTransitioning.value) {
-    jumpToSlide(index);
+    jumpToSlide(index)
   }
-};
+}
 
 /**
  * Touch event handlers for mobile swipe
  */
 const handleTouchStart = (e) => {
-  touchStartX.value = e.touches[0].clientX;
-  touchStartY.value = e.touches[0].clientY;
-  isSwiping.value = true;
-  
+  touchStartX.value = e.touches[0].clientX
+  touchStartY.value = e.touches[0].clientY
+  isSwiping.value = true
+
   // Pause on touch
   if (!isPaused.value) {
-    pause();
+    pause()
   }
-};
+}
 
 const handleTouchMove = (e) => {
-  if (!isSwiping.value) return;
-  
-  touchEndX.value = e.touches[0].clientX;
-  touchEndY.value = e.touches[0].clientY;
-};
+  if (!isSwiping.value) return
+
+  touchEndX.value = e.touches[0].clientX
+  touchEndY.value = e.touches[0].clientY
+}
 
 const handleTouchEnd = () => {
-  if (!isSwiping.value) return;
-  
-  isSwiping.value = false;
-  
-  const deltaX = touchEndX.value - touchStartX.value;
-  const deltaY = touchEndY.value - touchStartY.value;
-  
+  if (!isSwiping.value) return
+
+  isSwiping.value = false
+
+  const deltaX = touchEndX.value - touchStartX.value
+  const deltaY = touchEndY.value - touchStartY.value
+
   // Check if horizontal swipe is dominant
   if (Math.abs(deltaX) > Math.abs(deltaY)) {
     if (Math.abs(deltaX) > props.swipeThreshold) {
       if (deltaX > 0) {
         // Swipe right - previous slide
-        previousSlide();
+        previousSlide()
       } else {
         // Swipe left - next slide
-        nextSlide();
+        nextSlide()
       }
     }
   }
-  
+
   // Resume after touch
   setTimeout(() => {
     if (isPaused.value) {
-      resume();
+      resume()
     }
-  }, 100);
-};
+  }, 100)
+}
 
 /**
  * Click handler for pause/resume
  */
 const handleClick = (e) => {
   // Only toggle pause on center area clicks (not nav zones)
-  const rect = wrapperRef.value.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const centerZone = rect.width * 0.3;
-  
+  const rect = wrapperRef.value.getBoundingClientRect()
+  const clickX = e.clientX - rect.left
+  const centerZone = rect.width * 0.3
+
   if (clickX > centerZone && clickX < rect.width - centerZone) {
-    togglePause();
-    emit(isPaused.value ? 'pause' : 'resume');
+    togglePause()
+    emit(isPaused.value ? 'pause' : 'resume')
   }
-};
+}
 
 /**
  * Animation lifecycle handlers
  */
 const handleAnimationStart = (type) => {
   if (type === 'enter') {
-    isLoading.value = true;
+    isLoading.value = true
   }
-};
+}
 
 const handleAnimationComplete = (type) => {
   if (type === 'enter') {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 /**
  * Hover handlers
  */
 const handleMouseEnter = () => {
   if (props.pauseOnHover && !isPaused.value) {
-    pause();
+    pause()
   }
-};
+}
 
 const handleMouseLeave = () => {
   if (props.pauseOnHover && isPaused.value) {
-    resume();
+    resume()
   }
-};
+}
 
 /**
  * Keyboard navigation
@@ -343,41 +341,41 @@ const handleKeydown = (e) => {
   switch (e.key) {
     case 'ArrowRight':
     case 'ArrowDown':
-      e.preventDefault();
-      nextSlide();
-      break;
+      e.preventDefault()
+      nextSlide()
+      break
     case 'ArrowLeft':
     case 'ArrowUp':
-      e.preventDefault();
-      previousSlide();
-      break;
+      e.preventDefault()
+      previousSlide()
+      break
     case ' ':
-      e.preventDefault();
-      togglePause();
-      break;
+      e.preventDefault()
+      togglePause()
+      break
     case 'Escape':
-      e.preventDefault();
-      pause();
-      break;
+      e.preventDefault()
+      pause()
+      break
   }
-};
+}
 
 /**
  * Lifecycle hooks
  */
 onMounted(() => {
   if (props.autoStart) {
-    startProgress();
-    emit('story-start');
+    startProgress()
+    emit('story-start')
   }
-  
+
   // Add keyboard listeners
-  window.addEventListener('keydown', handleKeydown);
-  
+  window.addEventListener('keydown', handleKeydown)
+
   // Add hover listeners
   if (props.pauseOnHover && wrapperRef.value) {
-    wrapperRef.value.addEventListener('mouseenter', handleMouseEnter);
-    wrapperRef.value.addEventListener('mouseleave', handleMouseLeave);
+    wrapperRef.value.addEventListener('mouseenter', handleMouseEnter)
+    wrapperRef.value.addEventListener('mouseleave', handleMouseLeave)
   }
 
   // Entrance animation for wrapper
@@ -386,25 +384,26 @@ onMounted(() => {
       opacity: 0,
       scale: 0.95,
       duration: 0.5,
-      ease: 'power2.out'
-    });
+      ease: 'power2.out',
+    })
   }
-});
+})
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown);
-  
+  window.removeEventListener('keydown', handleKeydown)
+
   if (props.pauseOnHover && wrapperRef.value) {
-    wrapperRef.value.removeEventListener('mouseenter', handleMouseEnter);
-    wrapperRef.value.removeEventListener('mouseleave', handleMouseLeave);
+    wrapperRef.value.removeEventListener('mouseenter', handleMouseEnter)
+    wrapperRef.value.removeEventListener('mouseleave', handleMouseLeave)
   }
-});
+})
 
 // Expose methods for parent components
 defineExpose({
   currentSlide,
   progress,
   isPaused,
+  waitingForAction,
   nextSlide,
   previousSlide,
   goToSlide,
@@ -412,8 +411,9 @@ defineExpose({
   resume,
   togglePause,
   reset,
-  startProgress
-});
+  startProgress,
+  completeAction,
+})
 </script>
 
 <style scoped>
@@ -435,11 +435,7 @@ defineExpose({
   left: 0;
   right: 0;
   z-index: 100;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.6) 0%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
   padding-top: env(safe-area-inset-top);
 }
 
@@ -455,11 +451,7 @@ defineExpose({
   left: 0;
   right: 0;
   z-index: 100;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.6) 0%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -532,7 +524,9 @@ defineExpose({
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Fade transition */
@@ -551,11 +545,11 @@ defineExpose({
   .story-wrapper {
     max-width: 100vw;
   }
-  
+
   .nav-overlay {
     width: 35%;
   }
-  
+
   .default-slide-content {
     padding: 1.5rem;
   }
@@ -569,11 +563,11 @@ defineExpose({
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   }
-  
+
   .story-header {
     border-radius: 12px 12px 0 0;
   }
-  
+
   .story-footer {
     border-radius: 0 0 12px 12px;
   }
@@ -593,7 +587,7 @@ defineExpose({
   .story-header {
     padding-top: env(safe-area-inset-top);
   }
-  
+
   .story-footer {
     padding-bottom: env(safe-area-inset-bottom);
   }

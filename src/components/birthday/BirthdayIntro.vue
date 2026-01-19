@@ -13,19 +13,15 @@
         <div class="intro-icon" ref="iconRef">
           <span class="emoji">🎉</span>
         </div>
-        
-        <h1 class="intro-title" ref="titleRef">
-          Happy Birthday
-        </h1>
-        
+
+        <h1 class="intro-title" ref="titleRef">Happy Birthday</h1>
+
         <p class="intro-name" ref="nameRef">
           {{ recipientName }}
         </p>
-        
-        <p class="intro-subtitle" ref="subtitleRef">
-          Your special day wrapped
-        </p>
-        
+
+        <p class="intro-subtitle" ref="subtitleRef">Your special day wrapped</p>
+
         <div class="intro-date" ref="dateRef">
           {{ formattedDate }}
         </div>
@@ -33,12 +29,7 @@
 
       <!-- Particles -->
       <div class="particles" ref="particlesRef">
-        <div 
-          v-for="i in 20" 
-          :key="i"
-          class="particle"
-          :style="getParticleStyle(i)"
-        >
+        <div v-for="i in 20" :key="i" class="particle" :style="getParticleStyle()">
           {{ getParticleEmoji(i) }}
         </div>
       </div>
@@ -46,65 +37,65 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from 'vue';
-import { gsap } from 'gsap';
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue'
+import { gsap } from 'gsap'
 
 const props = defineProps({
   recipientName: {
     type: String,
-    default: 'Faiz'
+    default: 'Faiz',
   },
   birthDate: {
     type: String,
-    default: 'January 19, 2026'
+    default: 'January 19, 2026',
   },
   isActive: {
     type: Boolean,
-    default: false
-  }
-});
+    default: false,
+  },
+})
 
 // Refs
-const introRef = ref(null);
-const iconRef = ref(null);
-const titleRef = ref(null);
-const nameRef = ref(null);
-const subtitleRef = ref(null);
-const dateRef = ref(null);
-const particlesRef = ref(null);
+const introRef = ref(null)
+const iconRef = ref(null)
+const titleRef = ref(null)
+const nameRef = ref(null)
+const subtitleRef = ref(null)
+const dateRef = ref(null)
+const particlesRef = ref(null)
 
-const formattedDate = ref(props.birthDate);
+const formattedDate = ref(props.birthDate)
 
-const particleEmojis = ['🎈', '🎉', '🎊', '✨', '💫', '⭐', '🌟', '💝'];
+const particleEmojis = ['🎈', '🎉', '🎊', '✨', '💫', '⭐', '🌟', '💝']
 
 /**
  * Get random particle emoji
  */
 const getParticleEmoji = (index) => {
-  return particleEmojis[index % particleEmojis.length];
-};
+  return particleEmojis[index % particleEmojis.length]
+}
 
 /**
  * Get random particle styles
  */
-const getParticleStyle = (index) => {
-  const left = Math.random() * 100;
-  const delay = Math.random() * 2;
-  const duration = 3 + Math.random() * 2;
-  
+const getParticleStyle = () => {
+  const left = Math.random() * 100
+  const delay = Math.random() * 2
+  const duration = 3 + Math.random() * 2
+
   return {
     left: `${left}%`,
     animationDelay: `${delay}s`,
-    animationDuration: `${duration}s`
-  };
-};
+    animationDuration: `${duration}s`,
+  }
+}
 
 /**
  * Play entrance animation
  */
 const playEntranceAnimation = () => {
-  const tl = gsap.timeline();
+  const tl = gsap.timeline()
 
   // Background circles
   tl.from('.circle', {
@@ -112,86 +103,113 @@ const playEntranceAnimation = () => {
     opacity: 0,
     duration: 1.2,
     stagger: 0.2,
-    ease: 'back.out(1.7)'
-  });
+    ease: 'back.out(1.7)',
+  })
 
   // Icon with bounce
-  tl.from(iconRef.value, {
-    scale: 0,
-    rotation: -180,
-    opacity: 0,
-    duration: 0.8,
-    ease: 'back.out(2)'
-  }, '-=0.8');
+  tl.from(
+    iconRef.value,
+    {
+      scale: 0,
+      rotation: -180,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'back.out(2)',
+    },
+    '-=0.8',
+  )
 
   // Title with split animation
-  tl.from(titleRef.value, {
-    y: 50,
-    opacity: 0,
-    duration: 0.6,
-    ease: 'power3.out'
-  }, '-=0.4');
+  tl.from(
+    titleRef.value,
+    {
+      y: 50,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power3.out',
+    },
+    '-=0.4',
+  )
 
   // Name with scale
-  tl.from(nameRef.value, {
-    scale: 0.8,
-    opacity: 0,
-    duration: 0.5,
-    ease: 'back.out(1.5)'
-  }, '-=0.3');
+  tl.from(
+    nameRef.value,
+    {
+      scale: 0.8,
+      opacity: 0,
+      duration: 0.5,
+      ease: 'back.out(1.5)',
+    },
+    '-=0.3',
+  )
 
   // Subtitle
-  tl.from(subtitleRef.value, {
-    y: 20,
-    opacity: 0,
-    duration: 0.4,
-    ease: 'power2.out'
-  }, '-=0.2');
+  tl.from(
+    subtitleRef.value,
+    {
+      y: 20,
+      opacity: 0,
+      duration: 0.4,
+      ease: 'power2.out',
+    },
+    '-=0.2',
+  )
 
   // Date
-  tl.from(dateRef.value, {
-    y: 20,
-    opacity: 0,
-    duration: 0.4,
-    ease: 'power2.out'
-  }, '-=0.2');
+  tl.from(
+    dateRef.value,
+    {
+      y: 20,
+      opacity: 0,
+      duration: 0.4,
+      ease: 'power2.out',
+    },
+    '-=0.2',
+  )
 
   // Particles burst
-  tl.from('.particle', {
-    scale: 0,
-    opacity: 0,
-    duration: 0.6,
-    stagger: {
-      each: 0.05,
-      from: 'random'
+  tl.from(
+    '.particle',
+    {
+      scale: 0,
+      opacity: 0,
+      duration: 0.6,
+      stagger: {
+        each: 0.05,
+        from: 'random',
+      },
+      ease: 'back.out(1.5)',
     },
-    ease: 'back.out(1.5)'
-  }, '-=0.6');
+    '-=0.6',
+  )
 
-  return tl;
-};
+  return tl
+}
 
 /**
  * Watch for active state
  */
-watch(() => props.isActive, (isActive) => {
-  if (isActive) {
-    playEntranceAnimation();
-  }
-});
+watch(
+  () => props.isActive,
+  (isActive) => {
+    if (isActive) {
+      playEntranceAnimation()
+    }
+  },
+)
 
 /**
  * Mount
  */
 onMounted(() => {
   if (props.isActive) {
-    playEntranceAnimation();
+    playEntranceAnimation()
   }
-});
+})
 
 defineExpose({
-  playEntranceAnimation
-});
+  playEntranceAnimation,
+})
 </script>
 
 <style scoped>
@@ -272,8 +290,13 @@ defineExpose({
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 .intro-title {
@@ -359,21 +382,21 @@ defineExpose({
   .intro-container {
     padding: 1.5rem;
   }
-  
+
   .emoji {
     font-size: 4rem;
   }
-  
+
   .circle-1 {
     width: 200px;
     height: 200px;
   }
-  
+
   .circle-2 {
     width: 150px;
     height: 150px;
   }
-  
+
   .particle {
     font-size: 1.2rem;
   }

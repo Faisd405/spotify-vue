@@ -16,19 +16,36 @@ A production-ready, mobile-first Vue.js component system for creating Instagram 
 ## 📁 Project Structure
 
 ```
-vue-wrapped/
+spotify-vue/
 ├── src/
+│   ├── main.ts                       # App entry (TypeScript)
+│   ├── router/index.ts               # Routes for the two demo views
 │   ├── components/
 │   │   ├── StoryWrapper.vue          # Main orchestrator component
 │   │   ├── StorySlide.vue            # Individual slide with animations
-│   │   └── VerticalProgressBar.vue   # Instagram-style progress bar
+│   │   ├── VerticalProgressBar.vue   # Instagram-style progress bar
+│   │   └── birthday/                 # Slides for the Emoria birthday demo
 │   ├── composables/
-│   │   └── useStoryProgress.js       # Core story logic composable
+│   │   ├── useStoryProgress.js       # Core story logic composable
+│   │   └── useStoryProgress.d.ts     # Type declarations
 │   ├── utils/
-│   │   └── gsapHelpers.js            # GSAP animation utilities
-│   └── examples/
-│       └── SpotifyWrappedDemo.vue    # Complete implementation example
+│   │   ├── gsapHelpers.js            # GSAP animation utilities
+│   │   └── gsapHelpers.d.ts          # Type declarations
+│   └── views/
+│       ├── SpotifyWrappedDemo.vue    # Spotify Wrapped-style example
+│       └── EmoriaBirthdayDemo.vue    # Birthday-greeting story example
 ```
+
+### Running the demo
+
+```bash
+pnpm install
+pnpm dev          # Vite dev server
+pnpm build        # type-check + production build
+pnpm lint         # oxlint + ESLint
+```
+
+Vitest is configured (`pnpm test:unit`), but the repository has no test files yet.
 
 ## 🚀 Quick Start
 
@@ -306,7 +323,7 @@ The components use scoped styles with CSS custom properties for easy theming:
 
 ## 🧪 Example Implementation
 
-See [SpotifyWrappedDemo.vue](src/examples/SpotifyWrappedDemo.vue) for a complete Spotify Wrapped-style implementation including:
+See [SpotifyWrappedDemo.vue](src/views/SpotifyWrappedDemo.vue) for a complete Spotify Wrapped-style implementation including:
 
 - Welcome screen
 - Stats slides (top artist, song, minutes)
